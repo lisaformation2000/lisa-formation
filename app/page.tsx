@@ -1,65 +1,99 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-white font-sans">
+      
+      {/* HERO */}
+      <section className="bg-violet-700 text-white py-20 px-6 text-center">
+        <h1 className="text-4xl font-bold mb-4">
+          Apprends à utiliser l'IA en 30 sessions
+        </h1>
+        <p className="text-xl mb-2">Simple. Concret. Sans jargon.</p>
+        <p className="text-lg mb-8 opacity-90">
+          Tu n'as pas besoin d'être expert. Tu as juste besoin de commencer.
+        </p>
+        <a href="/inscription" className="bg-white text-violet-700 font-bold py-4 px-8 rounded-full text-lg hover:bg-violet-50 transition">
+          Commencer pour 147€
+        </a>
+        <p className="mt-4 text-sm opacity-80">Paiement unique — Accès à vie</p>
+      </section>
+
+      {/* PROMESSE */}
+      <section className="py-16 px-6 max-w-3xl mx-auto text-center">
+        <h2 className="text-3xl font-bold text-violet-700 mb-6">
+          Ce que tu vas maîtriser
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="p-6 rounded-2xl bg-violet-50">
+            <div className="text-4xl mb-3">🛠️</div>
+            <h3 className="font-bold text-lg mb-2">Les outils</h3>
+            <p className="text-gray-600">Claude, ChatGPT, Gemini, Perplexity — tu sauras lequel utiliser et quand.</p>
+          </div>
+          <div className="p-6 rounded-2xl bg-violet-50">
+            <div className="text-4xl mb-3">⚡</div>
+            <h3 className="font-bold text-lg mb-2">Gagner du temps</h3>
+            <p className="text-gray-600">Emails, résumés, organisation — l'IA devient ton assistant au quotidien.</p>
+          </div>
+          <div className="p-6 rounded-2xl bg-violet-50">
+            <div className="text-4xl mb-3">🧠</div>
+            <h3 className="font-bold text-lg mb-2">L'esprit critique</h3>
+            <p className="text-gray-600">Tu sais ce que l'IA rate, comment vérifier, et rester maître de tes décisions.</p>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+      </section>
+
+      {/* PROGRAMME */}
+      <section className="py-16 px-6 bg-gray-50">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-violet-700 mb-10 text-center">Le programme — 4 semaines</h2>
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <div className="text-violet-600 font-bold mb-1">Semaine 1</div>
+              <h3 className="font-bold text-lg mb-2">Découvrir les outils</h3>
+              <p className="text-gray-600">Créer ses comptes, comprendre les prompts, esprit critique — Sessions 1 à 7</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <div className="text-violet-600 font-bold mb-1">Semaine 2</div>
+              <h3 className="font-bold text-lg mb-2">L'IA dans ta vie de tous les jours</h3>
+              <p className="text-gray-600">Emails, contenu, organisation, recherche — Sessions 8 à 14</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <div className="text-violet-600 font-bold mb-1">Semaine 3</div>
+              <h3 className="font-bold text-lg mb-2">Aller plus loin</h3>
+              <p className="text-gray-600">Prompts avancés, éthique, IA Act, automatisation — Sessions 15 à 21</p>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
+              <div className="text-violet-600 font-bold mb-1">Semaine 4</div>
+              <h3 className="font-bold text-lg mb-2">Autonomie complète</h3>
+              <p className="text-gray-600">Veille, positionnement, certifications, plan 90 jours — Sessions 22 à 30</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PRIX */}
+      <section className="py-16 px-6 text-center">
+        <div className="max-w-md mx-auto bg-violet-700 text-white rounded-3xl p-10">
+          <h2 className="text-3xl font-bold mb-2">147€</h2>
+          <p className="text-lg mb-6 opacity-90">Paiement unique — Accès à vie</p>
+          <ul className="text-left space-y-3 mb-8">
+            <li>✅ Session découverte gratuite</li>
+            <li>✅ 30 sessions complètes</li>
+            <li>✅ Exercices pratiques</li>
+            <li>✅ Attestation de formation</li>
+            <li>✅ Mises à jour incluses</li>
+          </ul>
+          <a href="/inscription" className="bg-white text-violet-700 font-bold py-4 px-8 rounded-full text-lg hover:bg-violet-50 transition block text-center">
+            Je commence maintenant
           </a>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="py-8 text-center text-gray-400 text-sm">
+        <p>LISA — La formation pour débuter avec l'IA</p>
+        <p className="mt-1">© 2026 — formationlisa.fr</p>
+      </footer>
+
+    </main>
   );
 }
