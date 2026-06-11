@@ -525,7 +525,7 @@ export default function DashboardPage() {
                         flexShrink: 0,
                       }}
                     >
-                      {isTerminee ? "✓" : index + 1}
+                      {isTerminee ? "✓" : index }
                     </div>
 
                     <div>

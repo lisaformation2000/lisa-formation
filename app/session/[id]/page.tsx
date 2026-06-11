@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
+import { use } from 'react'
 
 const supabase = createBrowserClient(
   'https://cejaflvoowyytkuqvwdz.supabase.co/rest/v1/',
@@ -17,6 +18,7 @@ interface SessionData {
     title: string
     steps: number
     duration?: string
+    description?: string
     parts?: Array<{
       title: string
       content: string
@@ -28,7 +30,8 @@ interface SessionData {
   }
 }
 
-export default function SessionPage({ params }: { params: { id: string } }) {
+export default function SessionPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const router = useRouter()
   const [session, setSession] = useState<SessionData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -45,13 +48,13 @@ export default function SessionPage({ params }: { params: { id: string } }) {
       }
       setUserId(user.id)
 
-      const sessionId = parseInt(params.id)
+      const sessionId = parseInt(id)
+      const isSlug = isNaN(sessionId)
 
-      const { data, error } = await supabase
-        .from('sessions_content')
-        .select('*')
-        .eq('session_id', sessionId)
-        .single()
+      const query = supabase.from('sessions_content').select('*')
+      const { data, error } = isSlug
+        ? await query.eq('slug', id).single()
+        : await query.eq('session_id', sessionId).single()
 
       if (error || !data) {
         router.push('/dashboard')
@@ -64,7 +67,7 @@ export default function SessionPage({ params }: { params: { id: string } }) {
         .from('user_progress')
         .select('*')
         .eq('user_id', user.id)
-        .eq('session_id', sessionId)
+        .eq('session_id', isSlug ? data.session_id : sessionId)
         .single()
 
       if (progress) setCompleted(true)
@@ -72,7 +75,7 @@ export default function SessionPage({ params }: { params: { id: string } }) {
     }
 
     init()
-  }, [params.id])
+  }, [id])
 
   const markComplete = async () => {
     if (!userId || !session || completed) return
@@ -88,7 +91,7 @@ export default function SessionPage({ params }: { params: { id: string } }) {
     setMarking(false)
   }
 
-  const currentId = parseInt(params.id)
+  const currentId = parseInt(id)
   const prevId = currentId > 0 ? currentId - 1 : null
   const nextId = currentId < 30 ? currentId + 1 : null
 
@@ -102,7 +105,7 @@ export default function SessionPage({ params }: { params: { id: string } }) {
 
   if (!session) return null
 
-  const { title, duration, parts } = session.content_json
+  const { title, duration, parts, description } = session.content_json as any
 
   return (
     <div style={{ backgroundColor: '#070014', minHeight: '100vh', fontFamily: 'sans-serif' }}>
@@ -138,9 +141,22 @@ export default function SessionPage({ params }: { params: { id: string } }) {
           </p>
         )}
 
-        {parts && parts.map((part, index) => (
-          <div key={index} style={{ marginBottom: '40px' }}>
+        {description && !parts && (
+          <div style={{
+            backgroundColor: 'rgba(167, 139, 250, 0.05)',
+            border: '1px solid rgba(167, 139, 250, 0.2)',
+            borderRadius: '12px',
+            padding: '24px',
+            marginBottom: '32px'
+          }}>
+            <p style={{ color: '#e2e8f0', lineHeight: '1.8', fontSize: '1rem', margin: 0 }}>
+              {description}
+            </p>
+          </div>
+        )}
 
+        {parts && parts.map((part: any, index: number) => (
+          <div key={index} style={{ marginBottom: '40px' }}>
             <h2 style={{
               fontSize: '1.2rem',
               fontWeight: '600',
@@ -151,90 +167,28 @@ export default function SessionPage({ params }: { params: { id: string } }) {
             }}>
               {part.title}
             </h2>
-
             {part.content && (
               <p style={{ color: '#e2e8f0', lineHeight: '1.8', marginBottom: '16px', whiteSpace: 'pre-wrap' }}>
                 {part.content}
               </p>
             )}
-
             {part.note && (
-              <div style={{
-                border: '1px solid #67E8F9',
-                borderRadius: '8px',
-                padding: '16px',
-                marginBottom: '16px',
-                backgroundColor: 'rgba(103, 232, 249, 0.05)'
-              }}>
-                <p style={{ color: '#67E8F9', fontSize: '0.9rem', fontStyle: 'italic', margin: 0 }}>
-                  💡 {part.note}
-                </p>
+              <div style={{ border: '1px solid #67E8F9', borderRadius: '8px', padding: '16px', marginBottom: '16px', backgroundColor: 'rgba(103, 232, 249, 0.05)' }}>
+                <p style={{ color: '#67E8F9', fontSize: '0.9rem', fontStyle: 'italic', margin: 0 }}>💡 {part.note}</p>
               </div>
             )}
-
-            {part.table && (
-              <div style={{ marginBottom: '16px' }}>
-                {part.table.map((row, i) => (
-                  <div key={i} style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 2fr',
-                    borderBottom: '1px solid rgba(167, 139, 250, 0.2)',
-                    padding: '10px 0'
-                  }}>
-                    <span style={{ color: '#A78BFA', fontWeight: '500', fontSize: '0.9rem' }}>{row.key}</span>
-                    <span style={{ color: '#e2e8f0', fontSize: '0.9rem' }}>{row.value}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {part.prompts && part.prompts.map((prompt, i) => (
-              <div key={i} style={{
-                border: '1px solid #F472B6',
-                borderRadius: '8px',
-                padding: '16px',
-                marginBottom: '12px',
-                backgroundColor: 'rgba(244, 114, 182, 0.05)'
-              }}>
-                <p style={{ color: '#F472B6', fontWeight: '600', fontSize: '0.85rem', marginBottom: '8px' }}>
-                  📋 {prompt.label}
-                </p>
-                <p style={{ color: '#e2e8f0', fontSize: '0.9rem', margin: 0, whiteSpace: 'pre-wrap' }}>
-                  {prompt.text}
-                </p>
+            {part.prompts && part.prompts.map((prompt: any, i: number) => (
+              <div key={i} style={{ border: '1px solid #F472B6', borderRadius: '8px', padding: '16px', marginBottom: '12px', backgroundColor: 'rgba(244, 114, 182, 0.05)' }}>
+                <p style={{ color: '#F472B6', fontWeight: '600', fontSize: '0.85rem', marginBottom: '8px' }}>📋 {prompt.label}</p>
+                <p style={{ color: '#e2e8f0', fontSize: '0.9rem', margin: 0, whiteSpace: 'pre-wrap' }}>{prompt.text}</p>
               </div>
             ))}
-
-            {part.exercise && (
-              <div style={{
-                border: '1px solid #FCD34D',
-                borderRadius: '8px',
-                padding: '16px',
-                backgroundColor: 'rgba(252, 211, 77, 0.05)'
-              }}>
-                <p style={{ color: '#FCD34D', fontWeight: '600', marginBottom: '12px' }}>
-                  ✏️ {part.exercise.title}
-                </p>
-                {part.exercise.steps.map((step, i) => (
-                  <p key={i} style={{ color: '#e2e8f0', fontSize: '0.9rem', marginBottom: '8px' }}>
-                    {i + 1}. {step}
-                  </p>
-                ))}
-              </div>
-            )}
           </div>
         ))}
 
         <div style={{ textAlign: 'center', margin: '40px 0' }}>
           {completed ? (
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              color: '#4ade80',
-              fontSize: '1rem',
-              fontWeight: '600'
-            }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#4ade80', fontSize: '1rem', fontWeight: '600' }}>
               ✅ Session complétée !
             </div>
           ) : (
@@ -243,14 +197,9 @@ export default function SessionPage({ params }: { params: { id: string } }) {
               disabled={marking}
               style={{
                 background: 'linear-gradient(135deg, #A78BFA, #F472B6)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '14px 32px',
-                fontSize: '1rem',
-                fontWeight: '600',
-                cursor: marking ? 'not-allowed' : 'pointer',
-                opacity: marking ? 0.7 : 1
+                color: 'white', border: 'none', borderRadius: '8px',
+                padding: '14px 32px', fontSize: '1rem', fontWeight: '600',
+                cursor: marking ? 'not-allowed' : 'pointer', opacity: marking ? 0.7 : 1
               }}
             >
               {marking ? 'Enregistrement...' : '✓ Marquer comme complétée'}
@@ -262,33 +211,15 @@ export default function SessionPage({ params }: { params: { id: string } }) {
           {prevId !== null ? (
             <button
               onClick={() => router.push(`/session/${prevId}`)}
-              style={{
-                color: '#A78BFA',
-                background: 'none',
-                border: '1px solid #A78BFA',
-                borderRadius: '8px',
-                padding: '10px 20px',
-                cursor: 'pointer',
-                fontSize: '0.9rem'
-              }}
+              style={{ color: '#A78BFA', background: 'none', border: '1px solid #A78BFA', borderRadius: '8px', padding: '10px 20px', cursor: 'pointer', fontSize: '0.9rem' }}
             >
               ← Session précédente
             </button>
           ) : <div />}
-
           {nextId !== null && (
             <button
               onClick={() => router.push(`/session/${nextId}`)}
-              style={{
-                background: 'linear-gradient(135deg, #A78BFA, #F472B6)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '10px 20px',
-                cursor: 'pointer',
-                fontSize: '0.9rem',
-                fontWeight: '600'
-              }}
+              style={{ background: 'linear-gradient(135deg, #A78BFA, #F472B6)', color: 'white', border: 'none', borderRadius: '8px', padding: '10px 20px', cursor: 'pointer', fontSize: '0.9rem', fontWeight: '600' }}
             >
               Session suivante →
             </button>
