@@ -6,37 +6,37 @@ import Link from "next/link";
 import { createBrowserClient } from "@supabase/ssr";
 
 const sessions = [
-  { id: "decouverte", titre: "Session Découverte", gratuite: true },
-  { id: "s1", titre: "S1 — Accéder aux outils et créer son compte" },
-  { id: "s2", titre: "S2 — Comprendre et maîtriser les prompts" },
-  { id: "s3", titre: "S3 — Claude et ChatGPT" },
-  { id: "s4", titre: "S4 — Ce que l'IA sait faire (et ce qu'elle rate)" },
-  { id: "s5", titre: "S5 — Apprendre à vérifier" },
-  { id: "s6", titre: "S6 — L'IA dans ta vie pro" },
-  { id: "s7", titre: "S7 — Bilan Semaine 1 + Perplexity" },
-  { id: "s8", titre: "S8 — Gagner du temps au quotidien" },
-  { id: "s9", titre: "S9 — Créer du contenu avec l'IA" },
-  { id: "s10", titre: "S10 — Organiser ses idées et ses projets" },
-  { id: "s11", titre: "S11 — Recherches avec Gemini et Perplexity" },
-  { id: "s12", titre: "S12 — Les meilleurs outils gratuits" },
-  { id: "s13", titre: "S13 — Cas concret — Témoignage réel" },
-  { id: "s14", titre: "S14 — Bilan Semaine 2 + Meta AI" },
-  { id: "s15", titre: "S15 — Prompts avancés" },
-  { id: "s16", titre: "S16 — Apprendre plus vite avec l'IA" },
-  { id: "s17", titre: "S17 — Construire une offre avec l'IA" },
-  { id: "s18", titre: "S18 — Éthique, données et IA Act" },
-  { id: "s19", titre: "S19 — Automatiser sans coder" },
-  { id: "s20", titre: "S20 — IA et accompagnement humain" },
-  { id: "s21", titre: "S21 — Point d'étape + Grok" },
-  { id: "s22", titre: "S22 — Rester à jour sans effort" },
-  { id: "s23", titre: "S23 — Créer ta veille IA personnelle" },
-  { id: "s24", titre: "S24 — L'IA et l'équilibre humain" },
-  { id: "s25", titre: "S25 — Ton positionnement autour de l'IA" },
-  { id: "s26", titre: "S26 — IA et bien-être" },
-  { id: "s27", titre: "S27 — Tour complet des IA et certifications" },
-  { id: "s28", titre: "S28 — Ton projet sur 90 jours" },
-  { id: "s29", titre: "S29 — Débrief complet des 28 sessions" },
-  { id: "s30", titre: "S30 — Bilan final, certificat et suite" },
+  { id: 0, titre: "Session Découverte", gratuite: true },
+  { id: 1, titre: "S1 — Accéder aux outils et créer son compte" },
+  { id: 2, titre: "S2 — Comprendre et maîtriser les prompts" },
+  { id: 3, titre: "S3 — Claude et ChatGPT" },
+  { id: 4, titre: "S4 — Ce que l'IA sait faire (et ce qu'elle rate)" },
+  { id: 5, titre: "S5 — Apprendre à vérifier" },
+  { id: 6, titre: "S6 — L'IA dans ta vie pro" },
+  { id: 7, titre: "S7 — Bilan Semaine 1 + Perplexity" },
+  { id: 8, titre: "S8 — Gagner du temps au quotidien" },
+  { id: 9, titre: "S9 — Créer du contenu avec l'IA" },
+  { id: 10, titre: "S10 — Organiser ses idées et ses projets" },
+  { id: 11, titre: "S11 — Recherches avec Gemini et Perplexity" },
+  { id: 12, titre: "S12 — Les meilleurs outils gratuits" },
+  { id: 13, titre: "S13 — Cas concret — Témoignage réel" },
+  { id: 14, titre: "S14 — Bilan Semaine 2 + Meta AI" },
+  { id: 15, titre: "S15 — Prompts avancés" },
+  { id: 16, titre: "S16 — Apprendre plus vite avec l'IA" },
+  { id: 17, titre: "S17 — Construire une offre avec l'IA" },
+  { id: 18, titre: "S18 — Éthique, données et IA Act" },
+  { id: 19, titre: "S19 — Automatiser sans coder" },
+  { id: 20, titre: "S20 — IA et accompagnement humain" },
+  { id: 21, titre: "S21 — Point d'étape + Grok" },
+  { id: 22, titre: "S22 — Rester à jour sans effort" },
+  { id: 23, titre: "S23 — Créer ta veille IA personnelle" },
+  { id: 24, titre: "S24 — L'IA et l'équilibre humain" },
+  { id: 25, titre: "S25 — Ton positionnement autour de l'IA" },
+  { id: 26, titre: "S26 — IA et bien-être" },
+  { id: 27, titre: "S27 — Tour complet des IA et certifications" },
+  { id: 28, titre: "S28 — Ton projet sur 90 jours" },
+  { id: 29, titre: "S29 — Débrief complet des 28 sessions" },
+  { id: 30, titre: "S30 — Bilan final, certificat et suite" },
 ];
 
 const appareils = [
@@ -48,11 +48,9 @@ const appareils = [
 
 function normaliserAppareil(value: unknown): string[] {
   if (!value) return [];
-
   if (Array.isArray(value)) {
     return value.filter((item) => typeof item === "string");
   }
-
   if (typeof value === "string") {
     try {
       const parsed = JSON.parse(value);
@@ -63,7 +61,6 @@ function normaliserAppareil(value: unknown): string[] {
       return [];
     }
   }
-
   return [];
 }
 
@@ -78,14 +75,7 @@ function AppareilSelector({
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          gap: "12px",
-          flexWrap: "wrap",
-          marginBottom: "20px",
-        }}
-      >
+      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "20px" }}>
         {appareils.map((a) => (
           <button
             key={a.id}
@@ -154,7 +144,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [prenom, setPrenom] = useState("");
   const [appareil, setAppareil] = useState<string[]>([]);
-  const [progress, setProgress] = useState<Record<string, string>>({});
+  const [progress, setProgress] = useState<Record<number, string>>({});
   const [showAppareil, setShowAppareil] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -169,7 +159,6 @@ export default function DashboardPage() {
         }
 
         const currentUser = data.session.user;
-
         setUser(currentUser);
         setPrenom(
           currentUser.user_metadata?.prenom ||
@@ -185,7 +174,6 @@ export default function DashboardPage() {
 
         if (!profileError && profile?.appareil_prefere) {
           const appareilSauvegarde = normaliserAppareil(profile.appareil_prefere);
-
           if (appareilSauvegarde.length > 0) {
             setAppareil(appareilSauvegarde);
           } else {
@@ -201,14 +189,12 @@ export default function DashboardPage() {
           .eq("user_id", currentUser.id);
 
         if (!progressError && prog) {
-          const map: Record<string, string> = {};
-
+          const map: Record<number, string> = {};
           prog.forEach((p: any) => {
-            if (p.session_id && p.statut) {
+            if (p.session_id !== undefined && p.statut) {
               map[p.session_id] = p.statut;
             }
           });
-
           setProgress(map);
         }
       } catch (error) {
@@ -223,7 +209,6 @@ export default function DashboardPage() {
 
   const sauvegarderAppareil = async (selection: string[]) => {
     if (!user) return;
-
     setAppareil(selection);
     setShowAppareil(false);
 
@@ -264,12 +249,7 @@ export default function DashboardPage() {
           justifyContent: "center",
         }}
       >
-        <p
-          style={{
-            color: "rgba(255,255,255,0.4)",
-            fontFamily: "'Inter', sans-serif",
-          }}
-        >
+        <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'Inter', sans-serif" }}>
           Chargement...
         </p>
       </main>
@@ -307,7 +287,6 @@ export default function DashboardPage() {
           <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>
             Bonjour {prenom} 👋
           </span>
-
           <button
             onClick={handleDeconnexion}
             style={{
@@ -339,21 +318,10 @@ export default function DashboardPage() {
             <h2 style={{ fontSize: "18px", fontWeight: 700, marginBottom: "8px" }}>
               Sur quel appareil travailles-tu ?
             </h2>
-
-            <p
-              style={{
-                fontSize: "14px",
-                color: "rgba(255,255,255,0.5)",
-                marginBottom: "20px",
-              }}
-            >
+            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginBottom: "20px" }}>
               Tu pourras modifier ce choix à tout moment.
             </p>
-
-            <AppareilSelector
-              appareils={appareils}
-              onValider={sauvegarderAppareil}
-            />
+            <AppareilSelector appareils={appareils} onValider={sauvegarderAppareil} />
           </div>
         )}
 
@@ -366,16 +334,9 @@ export default function DashboardPage() {
             marginBottom: "32px",
           }}
         >
-          <p
-            style={{
-              fontSize: "14px",
-              color: "rgba(255,255,255,0.5)",
-              marginBottom: "8px",
-            }}
-          >
+          <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginBottom: "8px" }}>
             Bonjour {prenom} 👋
           </p>
-
           <p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px" }}>
             Tu as terminé{" "}
             <span style={{ color: "#A78BFA" }}>
@@ -404,10 +365,7 @@ export default function DashboardPage() {
           </div>
 
           {prochaineSession && (
-            <Link
-              href={`/session/${prochaineSession.id}`}
-              style={{ textDecoration: "none" }}
-            >
+            <Link href={`/session/${prochaineSession.id}`} style={{ textDecoration: "none" }}>
               <button
                 style={{
                   background: "linear-gradient(90deg, #A78BFA, #F472B6)",
@@ -440,7 +398,6 @@ export default function DashboardPage() {
             <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>
               Ton appareil :
             </span>
-
             {appareil.map((a) => (
               <span
                 key={a}
@@ -456,7 +413,6 @@ export default function DashboardPage() {
                 {appareils.find((ap) => ap.id === a)?.label}
               </span>
             ))}
-
             <button
               onClick={() => setShowAppareil(true)}
               style={{
@@ -518,14 +474,12 @@ export default function DashboardPage() {
                         alignItems: "center",
                         justifyContent: "center",
                         fontSize: "13px",
-                        color: isTerminee
-                          ? "#67E8F9"
-                          : "rgba(255,255,255,0.3)",
+                        color: isTerminee ? "#67E8F9" : "rgba(255,255,255,0.3)",
                         fontWeight: 700,
                         flexShrink: 0,
                       }}
                     >
-                      {isTerminee ? "✓" : index }
+                      {isTerminee ? "✓" : index}
                     </div>
 
                     <div>
@@ -533,15 +487,12 @@ export default function DashboardPage() {
                         style={{
                           fontSize: "15px",
                           fontWeight: 600,
-                          color: isTerminee
-                            ? "rgba(255,255,255,0.6)"
-                            : "#ffffff",
+                          color: isTerminee ? "rgba(255,255,255,0.6)" : "#ffffff",
                         }}
                       >
                         {session.titre}
                       </p>
-
-                      {session.gratuite && (
+                      {(session as any).gratuite && (
                         <span style={{ fontSize: "11px", color: "#FCD34D" }}>
                           Gratuite
                         </span>
