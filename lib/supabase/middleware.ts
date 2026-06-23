@@ -1,4 +1,4 @@
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
@@ -39,12 +39,12 @@ export async function updateSession(request: NextRequest) {
 
   if (user && isSession && !isFreeSession) {
     const { data: profile } = await supabase
-      .from('user_profile')
-      .select('has_paid')
-      .eq('user_id', user.id)
+      .from('profiles')
+      .select('is_paid')
+      .eq('id', user.id)
       .maybeSingle()
 
-    if (!profile?.has_paid) {
+    if (!profile?.is_paid) {
       const url = request.nextUrl.clone()
       url.pathname = '/inscription'
       url.searchParams.set('reason', 'paiement_requis')
