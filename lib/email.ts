@@ -2,13 +2,17 @@ import { Resend } from 'resend'
 import WelcomeEmail from '@/emails/WelcomeEmail'
 import RetractationAckEmail from '@/emails/RetractationAckEmail'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 const FROM = process.env.RESEND_FROM_EMAIL || 'LISA <contact@formationlisa.fr>'
 
-export async function envoyerEmailBienvenue(params: { to: string; prenom: string }) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://formationlisa.fr'
+function getResend() {
+  if (!process.env.RESEND_API_KEY) return null
+  return new Resend(process.env.RESEND_API_KEY)
+}
 
+export async function envoyerEmailBienvenue(params: { to: string; prenom: string }) {
+  const resend = getResend()
+  if (!resend) return
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://formationlisa.fr'
   return resend.emails.send({
     from: FROM,
     to: params.to,
@@ -23,6 +27,8 @@ export async function envoyerAccuseRetractation(params: {
   referenceCommande?: string
   dateCommande?: string
 }) {
+  const resend = getResend()
+  if (!resend) return
   return resend.emails.send({
     from: FROM,
     to: params.to,
@@ -42,9 +48,10 @@ export async function notifierNadiaRetractation(params: {
   referenceCommande?: string
   message?: string
 }) {
+  const resend = getResend()
+  if (!resend) return
   const notifTo = process.env.NOTIF_RETRACTATION_EMAIL
   if (!notifTo) return
-
   return resend.emails.send({
     from: FROM,
     to: notifTo,
