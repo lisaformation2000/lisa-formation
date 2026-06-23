@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createBrowserClient } from "@supabase/ssr";
+import { createClient } from "@/lib/supabase/client";
 
 const sessions = [
   { id: 0, titre: "Session Découverte", gratuite: true },
@@ -81,11 +81,10 @@ function AppareilSelector({
             key={a.id}
             onClick={() =>
               setSelection((prev) =>
-                prev.includes(a.id)
-                  ? prev.filter((x) => x !== a.id)
-                  : [...prev, a.id]
+                prev.includes(a.id) ? prev.filter((x) => x !== a.id) : [...prev, a.id]
               )
             }
+            aria-pressed={selection.includes(a.id)}
             style={{
               padding: "10px 20px",
               borderRadius: "10px",
@@ -95,9 +94,7 @@ function AppareilSelector({
               background: selection.includes(a.id)
                 ? "linear-gradient(90deg, #A78BFA, #F472B6)"
                 : "rgba(255,255,255,0.05)",
-              border: selection.includes(a.id)
-                ? "none"
-                : "1px solid rgba(255,255,255,0.1)",
+              border: selection.includes(a.id) ? "none" : "1px solid rgba(255,255,255,0.1)",
               color: "#ffffff",
             }}
           >
@@ -131,22 +128,16 @@ function AppareilSelector({
 
 export default function DashboardPage() {
   const router = useRouter();
-
-  const supabase = useMemo(
-    () =>
-      createBrowserClient(
-        "https://cejaflvoowyytkuqvwdz.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlamFmbHZvb3d5eXRrdXF2d2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MjkyNDcsImV4cCI6MjA5NTUwNTI0N30.T2M46dGoj39SpYnJqcl_uGc7xlJYPK72jos8Beb9blU"
-      ),
-    []
-  );
+  const supabase = useMemo(() => createClient(), []);
 
   const [user, setUser] = useState<any>(null);
   const [prenom, setPrenom] = useState("");
+  const [hasPaid, setHasPaid] = useState(false);
   const [appareil, setAppareil] = useState<string[]>([]);
   const [progress, setProgress] = useState<Record<number, string>>({});
   const [showAppareil, setShowAppareil] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [genCertificat, setGenCertificat] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -161,26 +152,28 @@ export default function DashboardPage() {
         const currentUser = data.session.user;
         setUser(currentUser);
         setPrenom(
-          currentUser.user_metadata?.prenom ||
-            currentUser.email?.split("@")[0] ||
-            ""
+          currentUser.user_metadata?.prenom || currentUser.email?.split("@")[0] || ""
         );
 
         const { data: profile, error: profileError } = await supabase
           .from("user_profile")
-          .select("appareil_prefere")
+          .select("appareil_prefere, has_paid")
           .eq("user_id", currentUser.id)
           .maybeSingle();
 
-        if (!profileError && profile?.appareil_prefere) {
-          const appareilSauvegarde = normaliserAppareil(profile.appareil_prefere);
-          if (appareilSauvegarde.length > 0) {
-            setAppareil(appareilSauvegarde);
+        if (!profileError) {
+          setHasPaid(Boolean(profile?.has_paid));
+
+          if (profile?.appareil_prefere) {
+            const appareilSauvegarde = normaliserAppareil(profile.appareil_prefere);
+            if (appareilSauvegarde.length > 0) {
+              setAppareil(appareilSauvegarde);
+            } else {
+              setShowAppareil(true);
+            }
           } else {
             setShowAppareil(true);
           }
-        } else {
-          setShowAppareil(true);
         }
 
         const { data: prog, error: progressError } = await supabase
@@ -213,21 +206,15 @@ export default function DashboardPage() {
     setShowAppareil(false);
 
     const { error } = await supabase.from("user_profile").upsert(
-      {
-        user_id: user.id,
-        appareil_prefere: JSON.stringify(selection),
-      },
+      { user_id: user.id, appareil_prefere: JSON.stringify(selection) },
       { onConflict: "user_id" }
     );
 
-    if (error) {
-      console.error("Erreur sauvegarde appareil :", error);
-    }
+    if (error) console.error("Erreur sauvegarde appareil :", error);
   };
 
-  const sessionsTerminees = Object.values(progress).filter(
-    (s) => s === "terminee"
-  ).length;
+  const sessionsTerminees = Object.values(progress).filter((s) => s === "terminee").length;
+  const formationTerminee = sessionsTerminees >= 30;
 
   const prochaineSession = sessions.find(
     (s) => !progress[s.id] || progress[s.id] === "a_faire"
@@ -236,6 +223,27 @@ export default function DashboardPage() {
   const handleDeconnexion = async () => {
     await supabase.auth.signOut();
     router.push("/");
+  };
+
+  const telechargerCertificat = async () => {
+    setGenCertificat(true);
+    try {
+      const res = await fetch("/api/certificate");
+      if (!res.ok) throw new Error("Erreur génération certificat");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Attestation-LISA.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setGenCertificat(false);
+    }
   };
 
   if (loading) {
@@ -276,11 +284,7 @@ export default function DashboardPage() {
         }}
       >
         <Link href="/" style={{ textDecoration: "none" }}>
-          <img
-            src="/logoLisa.webp"
-            alt="LISA"
-            style={{ height: "120px", width: "auto" }}
-          />
+          <img src="/logoLisa.webp" alt="LISA" style={{ height: "120px", width: "auto" }} />
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
@@ -305,6 +309,49 @@ export default function DashboardPage() {
       </nav>
 
       <div style={{ maxWidth: "800px", margin: "0 auto", padding: "40px 24px" }}>
+        {!hasPaid && (
+          <div
+            style={{
+              background: "rgba(244,114,182,0.08)",
+              border: "1px solid rgba(244,114,182,0.25)",
+              borderRadius: "16px",
+              padding: "24px 28px",
+              marginBottom: "32px",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "16px",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <p style={{ fontWeight: 700, fontSize: "15px", marginBottom: "4px" }}>
+                Accès limité à la Session Découverte
+              </p>
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+                Débloque les 30 sessions complètes pour 147€ — paiement unique, accès à vie.
+              </p>
+            </div>
+            <Link href="/inscription" style={{ textDecoration: "none" }}>
+              <button
+                style={{
+                  background: "linear-gradient(90deg, #A78BFA, #F472B6)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "10px",
+                  padding: "12px 22px",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Débloquer — 147€
+              </button>
+            </Link>
+          </div>
+        )}
+
         {showAppareil && (
           <div
             style={{
@@ -325,6 +372,49 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {formationTerminee && (
+          <div
+            style={{
+              background: "rgba(103,232,249,0.08)",
+              border: "1px solid rgba(103,232,249,0.25)",
+              borderRadius: "16px",
+              padding: "24px 28px",
+              marginBottom: "32px",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "16px",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <p style={{ fontWeight: 700, fontSize: "15px", marginBottom: "4px" }}>
+                🎉 Formation terminée — félicitations !
+              </p>
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
+                Ton attestation de formation est prête à télécharger.
+              </p>
+            </div>
+            <button
+              onClick={telechargerCertificat}
+              disabled={genCertificat}
+              style={{
+                background: "linear-gradient(90deg, #67E8F9, #A78BFA)",
+                color: "#070014",
+                border: "none",
+                borderRadius: "10px",
+                padding: "12px 22px",
+                fontSize: "14px",
+                fontWeight: 700,
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {genCertificat ? "Génération…" : "Télécharger mon attestation"}
+            </button>
+          </div>
+        )}
+
         <div
           style={{
             background: "rgba(255,255,255,0.03)",
@@ -334,9 +424,6 @@ export default function DashboardPage() {
             marginBottom: "32px",
           }}
         >
-          <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginBottom: "8px" }}>
-            Bonjour {prenom} 👋
-          </p>
           <p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px" }}>
             Tu as terminé{" "}
             <span style={{ color: "#A78BFA" }}>
@@ -364,7 +451,7 @@ export default function DashboardPage() {
             />
           </div>
 
-          {prochaineSession && (
+          {prochaineSession && !formationTerminee && (
             <Link href={`/session/${prochaineSession.id}`} style={{ textDecoration: "none" }}>
               <button
                 style={{
@@ -386,18 +473,8 @@ export default function DashboardPage() {
         </div>
 
         {appareil.length > 0 && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-              marginBottom: "24px",
-              flexWrap: "wrap",
-            }}
-          >
-            <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>
-              Ton appareil :
-            </span>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>Ton appareil :</span>
             {appareil.map((a) => (
               <span
                 key={a}
@@ -434,18 +511,17 @@ export default function DashboardPage() {
             const statut = progress[session.id] || "a_faire";
             const isTerminee = statut === "terminee";
             const isEnCours = statut === "en_cours";
+            const verrouillee = !session.gratuite && !hasPaid;
 
             return (
               <Link
                 key={session.id}
-                href={`/session/${session.id}`}
+                href={verrouillee ? "/inscription" : `/session/${session.id}`}
                 style={{ textDecoration: "none" }}
               >
                 <div
                   style={{
-                    background: isTerminee
-                      ? "rgba(103,232,249,0.04)"
-                      : "rgba(255,255,255,0.03)",
+                    background: isTerminee ? "rgba(103,232,249,0.04)" : "rgba(255,255,255,0.03)",
                     border: `1px solid ${
                       isTerminee
                         ? "rgba(103,232,249,0.15)"
@@ -459,6 +535,7 @@ export default function DashboardPage() {
                     justifyContent: "space-between",
                     alignItems: "center",
                     cursor: "pointer",
+                    opacity: verrouillee ? 0.55 : 1,
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
@@ -467,9 +544,7 @@ export default function DashboardPage() {
                         width: "32px",
                         height: "32px",
                         borderRadius: "50%",
-                        background: isTerminee
-                          ? "rgba(103,232,249,0.15)"
-                          : "rgba(255,255,255,0.05)",
+                        background: isTerminee ? "rgba(103,232,249,0.15)" : "rgba(255,255,255,0.05)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -479,7 +554,7 @@ export default function DashboardPage() {
                         flexShrink: 0,
                       }}
                     >
-                      {isTerminee ? "✓" : index}
+                      {isTerminee ? "✓" : verrouillee ? "🔒" : index}
                     </div>
 
                     <div>
@@ -493,9 +568,7 @@ export default function DashboardPage() {
                         {session.titre}
                       </p>
                       {(session as any).gratuite && (
-                        <span style={{ fontSize: "11px", color: "#FCD34D" }}>
-                          Gratuite
-                        </span>
+                        <span style={{ fontSize: "11px", color: "#FCD34D" }}>Gratuite</span>
                       )}
                     </div>
                   </div>
@@ -503,11 +576,7 @@ export default function DashboardPage() {
                   <span
                     style={{
                       fontSize: "12px",
-                      color: isTerminee
-                        ? "#67E8F9"
-                        : isEnCours
-                        ? "#A78BFA"
-                        : "rgba(255,255,255,0.25)",
+                      color: isTerminee ? "#67E8F9" : isEnCours ? "#A78BFA" : "rgba(255,255,255,0.25)",
                       background: isTerminee
                         ? "rgba(103,232,249,0.08)"
                         : isEnCours
@@ -523,7 +592,7 @@ export default function DashboardPage() {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {isTerminee ? "Terminée" : isEnCours ? "En cours" : "Commencer"}
+                    {verrouillee ? "147€" : isTerminee ? "Terminée" : isEnCours ? "En cours" : "Commencer"}
                   </span>
                 </div>
               </Link>

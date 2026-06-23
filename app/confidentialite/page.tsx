@@ -37,7 +37,7 @@ export default function Confidentialite() {
           </p>
           <h3 className="text-base font-semibold text-white mb-2">Emails automatiques</h3>
           <p className="text-gray-300 text-sm leading-relaxed">
-            Ton adresse email est utilisée pour l'envoi des confirmations et de l'attestation finale via Brevo.
+            Ton adresse email est utilisée pour l'envoi des confirmations et de l'attestation finale via Resend.
           </p>
         </section>
   
@@ -92,10 +92,10 @@ export default function Confidentialite() {
               </thead>
               <tbody>
                 {[
-                  ["Supabase", "Hébergement de la base de données"],
-                  ["Vercel", "Hébergement du site"],
-                  ["Stripe", "Traitement des paiements"],
-                  ["Brevo", "Envoi des emails automatiques"],
+                  ["Supabase", "Hébergement de la base de données et authentification"],
+                  ["Vercel", "Hébergement du site web"],
+                  ["Stripe", "Traitement sécurisé des paiements"],
+                  ["Resend", "Envoi des emails transactionnels (bienvenue, accusé de rétractation)"],
                 ].map(([name, role], i) => (
                   <tr key={name} className={`border-t border-white/10 ${i % 2 === 1 ? "bg-white/5" : ""}`}>
                     <td className="px-4 py-3 font-medium text-white">{name}</td>
@@ -113,10 +113,13 @@ export default function Confidentialite() {
         <section className="mb-10">
           <h2 className="text-xl font-bold text-violet-300 mb-4">6. Cookies</h2>
           <p className="text-gray-300 text-sm leading-relaxed mb-3">
-            Le site utilise uniquement des cookies techniques nécessaires au fonctionnement (session de connexion). Aucun cookie publicitaire ou de tracking tiers n'est utilisé.
+            Le site utilise uniquement des cookies <strong className="text-white">strictement nécessaires</strong> au fonctionnement : cookie de session d'authentification (Supabase), cookie de transaction sécurisée (Stripe lors du paiement). Ces cookies sont exemptés de consentement au sens de l'article 82 de la loi Informatique et Libertés.
           </p>
-          <p className="text-gray-300 text-sm leading-relaxed">
-            Un bandeau de consentement est présent sur le site conformément au RGPD.
+          <p className="text-gray-300 text-sm leading-relaxed mb-3">
+            Aucun cookie publicitaire, de suivi ou d'analyse comportementale n'est utilisé sur ce site. Aucune donnée de navigation n'est transmise à des régies publicitaires.
+          </p>
+          <p className="text-gray-400 text-xs italic">
+            Conformément aux recommandations de la CNIL, un bandeau de consentement n'est pas requis pour les cookies exclusivement techniques. Pour toute question : lisaformationia@gmail.com.
           </p>
         </section>
   

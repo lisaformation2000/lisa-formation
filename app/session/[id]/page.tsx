@@ -2,13 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createBrowserClient } from '@supabase/ssr'
 import { use } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
-const supabase = createBrowserClient(
-  'https://cejaflvoowyytkuqvwdz.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlamFmbHZvb3d5eXRrdXF2d2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MjkyNDcsImV4cCI6MjA5NTUwNTI0N30.T2M46dGoj39SpYnJqcl_uGc7xlJYPK72jos8Beb9blU'
-)
+const supabase = createClient()
 
 const APP_STYLE: Record<string, { couleur: string; bg: string; logo: string }> = {
   windows: { couleur: '#00C8FF', bg: '#00C8FF', logo: '⊞' },
@@ -170,10 +167,17 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push('/login'); return }
-      setUserId(user.id)
-
       const sessionId = parseInt(id)
+      const isFreeSession = sessionId === 0
+
+      // Session 0 : accessible sans compte
+      if (!user && !isFreeSession) {
+        router.push('/login')
+        return
+      }
+
+      if (user) setUserId(user.id)
+
       const isSlug = isNaN(sessionId)
       const query = supabase.from('sessions_content').select('*')
       const { data, error } = isSlug
@@ -183,10 +187,14 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       if (error || !data) { router.push('/dashboard'); return }
       setSession(data)
 
-      const { data: progress } = await supabase
-        .from('user_progress').select('*')
-        .eq('user_id', user.id).eq('session_id', data.session_id).maybeSingle()
-      if (progress) setCompleted(true)
+      // Progression : seulement si connecté
+      if (user) {
+        const { data: progress } = await supabase
+          .from('user_progress').select('*')
+          .eq('user_id', user.id).eq('session_id', data.session_id).maybeSingle()
+        if (progress) setCompleted(true)
+      }
+
       setLoading(false)
     }
     init()

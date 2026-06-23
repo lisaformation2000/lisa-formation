@@ -97,10 +97,14 @@ export default function CGV() {
             <span className="text-white font-medium">Exception :</span> conformément à l'article L221-28 du Code de la consommation, le droit de rétractation ne s'applique pas si tu as expressément accepté, lors de l'achat, de commencer la formation avant l'expiration du délai de 14 jours et reconnu perdre ainsi ton droit de rétractation.
           </p>
           <p className="text-gray-300 text-sm leading-relaxed mb-6">
-            Lors du paiement, une case à cocher te permet de faire ce choix. Si tu la coches, tu acceptes l'accès immédiat et renonces à ton droit de rétractation.
+            Lors du paiement, une case à cocher dédiée te permet de faire ce choix. Si tu la coches, tu acceptes l'accès immédiat et renonces expressément à ton droit de rétractation.
           </p>
           <p className="text-gray-300 text-sm leading-relaxed mb-4">
-            Pour exercer ton droit de rétractation, envoie un email à lisaformationia@gmail.com avec le formulaire suivant :
+            Pour exercer ton droit de rétractation (si applicable), tu peux utiliser{" "}
+            <a href="/retractation" className="text-violet-300 underline hover:text-violet-200">
+              notre formulaire de rétractation en ligne
+            </a>
+            {" "}— accessible librement, sans création de compte — ou envoyer un email à lisaformationia@gmail.com avec le formulaire suivant :
           </p>
           <div className="bg-white/5 border border-white/10 rounded-xl p-6 text-gray-300 text-sm space-y-3">
             <p className="font-bold text-white">FORMULAIRE DE RÉTRACTATION</p>
@@ -109,7 +113,7 @@ export default function CGV() {
             <p>Signature : ___________________________ &nbsp;&nbsp;&nbsp; Date : _______________</p>
           </div>
           <p className="text-gray-400 text-xs mt-3">
-            Le remboursement sera effectué dans un délai de 14 jours après réception de la demande, par le même moyen de paiement.
+            Un accusé de réception sur support durable te sera adressé dans les meilleurs délais. Le remboursement éventuel interviendra dans un délai de 14 jours à compter de la réception de la demande, par le même moyen de paiement que celui utilisé lors de l'achat.
           </p>
         </section>
   
@@ -181,14 +185,23 @@ export default function CGV() {
   
         <section className="mb-10">
           <h2 className="text-xl font-bold text-violet-300 mb-4">16. Médiation et litiges</h2>
-          <p className="text-gray-300 text-sm leading-relaxed mb-2">
-            En cas de litige, une solution amiable sera privilégiée. Les présentes CGV sont soumises au droit français.
+          <p className="text-gray-300 text-sm leading-relaxed mb-3">
+            En cas de litige, une solution amiable sera privilégiée. Contacte d'abord lisaformationia@gmail.com. Les présentes CGV sont soumises au droit français.
           </p>
           <p className="text-gray-300 text-sm leading-relaxed mb-2">
-            Médiation gratuite : <span className="text-violet-300">DEVIGNY MÉDIATION — devignymediation.fr</span>
+            En cas d'échec de la réclamation amiable, tu peux recourir gratuitement au service de médiation :
           </p>
-          <p className="text-gray-300 text-sm leading-relaxed">
-            En cas de litige non résolu à l'amiable, les règles de compétence prévues par le droit français s'appliqueront.
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-gray-300 space-y-1">
+            <p><span className="text-white font-medium">Médiateur :</span> CM2C — Centre de la Médiation de la Consommation de Conciliateurs de Justice</p>
+            <p><span className="text-white font-medium">Adresse :</span> 4 Rue Saint-Jean, 75017 Paris</p>
+            <p><span className="text-white font-medium">Site :</span>{" "}
+              <a href="https://www.cm2c.net" target="_blank" rel="noopener noreferrer" className="text-violet-300 underline hover:text-violet-200">
+                www.cm2c.net
+              </a>
+            </p>
+          </div>
+          <p className="text-gray-400 text-xs mt-3">
+            Liste officielle des médiateurs approuvés par la Commission d'évaluation et de contrôle de la médiation de la consommation (CECMC) disponible sur economie.gouv.fr.
           </p>
         </section>
   

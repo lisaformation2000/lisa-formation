@@ -3,8 +3,32 @@
 import Link from 'next/link';
 
 export default function Home() {
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: "LISA — La formation pour débuter avec l'IA",
+    description:
+      "Formation en ligne de 30 sessions pour apprendre à utiliser l'intelligence artificielle au quotidien, sans prérequis technique.",
+    provider: {
+      '@type': 'Organization',
+      name: 'LISA',
+      sameAs: 'https://formationlisa.fr',
+    },
+    offers: {
+      '@type': 'Offer',
+      price: '147',
+      priceCurrency: 'EUR',
+      availability: 'https://schema.org/InStock',
+      url: 'https://formationlisa.fr/inscription',
+    },
+  }
+
   return (
     <main className="min-h-screen bg-black text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
 
       {/* Barre de navigation */}
       <div className="w-full flex justify-end px-6 py-4">
@@ -106,10 +130,12 @@ export default function Home() {
       {/* Footer */}
       <div className="text-center text-gray-600 text-xs pb-8 px-6">
         <p>© 2026 LISA — La formation pour débuter avec l'IA</p>
-        <div className="flex justify-center gap-4 mt-2">
+        <div className="flex flex-wrap justify-center gap-4 mt-2">
           <Link href="/cgv" className="hover:text-gray-400">CGV</Link>
+          <Link href="/conditions-utilisation" className="hover:text-gray-400">Conditions d'utilisation</Link>
           <Link href="/mentions-legales" className="hover:text-gray-400">Mentions légales</Link>
           <Link href="/confidentialite" className="hover:text-gray-400">Confidentialité</Link>
+          <Link href="/retractation" className="hover:text-gray-400">Droit de rétractation</Link>
         </div>
       </div>
 

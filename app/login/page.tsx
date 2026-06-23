@@ -1,26 +1,28 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
-import { useRouter } from 'next/navigation'
+import { Suspense, useMemo, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
-  const [mode, setMode] = useState('login')
+  return (
+    <Suspense fallback={<main style={{ backgroundColor: '#070014', minHeight: '100vh' }} />}>
+      <LoginForm />
+    </Suspense>
+  )
+}
+
+function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const next = searchParams.get('next') || '/dashboard'
 
-  const supabase = useMemo(
-    () =>
-      createBrowserClient(
-        'https://cejaflvoowyytkuqvwdz.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlamFmbHZvb3d5eXRrdXF2d2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MjkyNDcsImV4cCI6MjA5NTUwNTI0N30.T2M46dGoj39SpYnJqcl_uGc7xlJYPK72jos8Beb9blU'
-      ),
-    []
-  )
+  const supabase = useMemo(() => createClient(), [])
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -36,37 +38,17 @@ export default function LoginPage() {
 
     setLoading(true)
     setError('')
-    setMessage('')
 
-    if (mode === 'login') {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
 
-      if (error) {
-        setError('Email ou mot de passe incorrect. Vérifie et réessaie.')
-        setLoading(false)
-        return
-      }
-
-      router.push('/dashboard')
-      router.refresh()
+    if (error) {
+      setError('Email ou mot de passe incorrect. Vérifie et réessaie.')
+      setLoading(false)
       return
     }
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    })
-
-    if (error) {
-      setError('Une erreur est survenue. Vérifie ton email et réessaie.')
-    } else {
-      setMessage("Un email de confirmation t'a été envoyé.")
-    }
-
-    setLoading(false)
+    router.push(next)
+    router.refresh()
   }
 
   return (
@@ -91,13 +73,9 @@ export default function LoginPage() {
           marginBottom: '48px',
         }}
       >
-        <a href="/" style={{ textDecoration: 'none' }}>
-          <img
-            src="/logoLisa.webp"
-            alt="LISA"
-            style={{ height: '120px', width: 'auto' }}
-          />
-        </a>
+        <Link href="/" style={{ textDecoration: 'none' }}>
+          <img src="/logoLisa.webp" alt="LISA" style={{ height: '120px', width: 'auto' }} />
+        </Link>
       </div>
 
       <form
@@ -112,122 +90,44 @@ export default function LoginPage() {
           margin: '0 24px',
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            background: 'rgba(255,255,255,0.06)',
-            borderRadius: '12px',
-            padding: '4px',
-            marginBottom: '28px',
-            gap: '4px',
-          }}
-        >
-          {['login', 'signup'].map((m) => (
-            <button
-              type="button"
-              key={m}
-              onClick={() => {
-                setMode(m)
-                setError('')
-                setMessage('')
-              }}
-              style={{
-                flex: 1,
-                padding: '10px',
-                borderRadius: '8px',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 600,
-                background:
-                  mode === m
-                    ? 'linear-gradient(90deg, #A78BFA, #F472B6)'
-                    : 'transparent',
-                color: '#ffffff',
-              }}
-            >
-              {m === 'login' ? 'Me connecter' : 'Créer un compte'}
-            </button>
-          ))}
-        </div>
-
-        <p
-          style={{
-            color: '#D4D4D8',
-            fontSize: '14px',
-            marginBottom: '24px',
-            lineHeight: 1.6,
-          }}
-        >
-          {mode === 'login'
-            ? 'Bon retour ! Entre tes identifiants pour accéder à ta formation.'
-            : 'Crée ton compte pour commencer la Session Découverte gratuite.'}
+        <h1 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '8px' }}>Me connecter</h1>
+        <p style={{ color: '#D4D4D8', fontSize: '14px', marginBottom: '24px', lineHeight: 1.6 }}>
+          Bon retour ! Entre tes identifiants pour accéder à ta formation.
         </p>
 
         <div style={{ marginBottom: '16px' }}>
-          <label
-            style={{
-              display: 'block',
-              color: '#D4D4D8',
-              fontSize: '13px',
-              marginBottom: '6px',
-            }}
-          >
+          <label htmlFor="email" style={{ display: 'block', color: '#D4D4D8', fontSize: '13px', marginBottom: '6px' }}>
             Adresse e-mail
           </label>
           <input
+            id="email"
             name="email"
             type="email"
             placeholder="ton@email.com"
             autoComplete="email"
-            style={{
-              width: '100%',
-              padding: '12px 14px',
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: '10px',
-              color: '#fff',
-              fontSize: '15px',
-              outline: 'none',
-              boxSizing: 'border-box',
-            }}
+            style={champStyle}
           />
         </div>
 
-        <div style={{ marginBottom: '24px' }}>
-          <label
-            style={{
-              display: 'block',
-              color: '#D4D4D8',
-              fontSize: '13px',
-              marginBottom: '6px',
-            }}
-          >
+        <div style={{ marginBottom: '8px' }}>
+          <label htmlFor="password" style={{ display: 'block', color: '#D4D4D8', fontSize: '13px', marginBottom: '6px' }}>
             Mot de passe
           </label>
 
           <div style={{ position: 'relative' }}>
             <input
+              id="password"
               name="password"
               type={showPassword ? 'text' : 'password'}
-              placeholder={mode === 'signup' ? 'Au moins 6 caractères' : '••••••••'}
-              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-              style={{
-                width: '100%',
-                padding: '12px 44px 12px 14px',
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: '10px',
-                color: '#fff',
-                fontSize: '15px',
-                outline: 'none',
-                boxSizing: 'border-box',
-              }}
+              placeholder="••••••••"
+              autoComplete="current-password"
+              style={{ ...champStyle, paddingRight: '44px' }}
             />
-
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+              aria-pressed={showPassword}
               style={{
                 position: 'absolute',
                 right: '12px',
@@ -244,89 +144,67 @@ export default function LoginPage() {
           </div>
         </div>
 
+        <p style={{ textAlign: 'right', marginBottom: '20px' }}>
+          <Link href="/reset-password" style={{ color: '#A78BFA', fontSize: '13px', textDecoration: 'none' }}>
+            Mot de passe oublié ?
+          </Link>
+        </p>
+
         {error && (
-          <div
-            style={{
-              background: 'rgba(244,114,182,0.1)',
-              border: '1px solid rgba(244,114,182,0.3)',
-              borderRadius: '8px',
-              padding: '12px',
-              marginBottom: '16px',
-              color: '#F472B6',
-              fontSize: '13px',
-            }}
-          >
+          <div role="alert" style={erreurStyle}>
             ⚠️ {error}
           </div>
         )}
 
-        {message && (
-          <div
-            style={{
-              background: 'rgba(103,232,249,0.1)',
-              border: '1px solid rgba(103,232,249,0.3)',
-              borderRadius: '8px',
-              padding: '12px',
-              marginBottom: '16px',
-              color: '#67E8F9',
-              fontSize: '13px',
-            }}
-          >
-            ✅ {message}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: '100%',
-            padding: '14px',
-            background: loading
-              ? 'rgba(255,255,255,0.1)'
-              : 'linear-gradient(90deg, #A78BFA, #F472B6)',
-            border: 'none',
-            borderRadius: '12px',
-            color: '#fff',
-            fontSize: '16px',
-            fontWeight: 700,
-            cursor: loading ? 'not-allowed' : 'pointer',
-          }}
-        >
-          {loading
-            ? 'Chargement...'
-            : mode === 'login'
-            ? 'Se connecter'
-            : 'Créer mon compte'}
+        <button type="submit" disabled={loading} style={{ ...boutonStyle, opacity: loading ? 0.6 : 1 }}>
+          {loading ? 'Connexion…' : 'Se connecter'}
         </button>
 
-        {mode === 'login' && (
-          <p style={{ textAlign: 'center', marginTop: '16px' }}>
-            <a
-              href="/reset-password"
-              style={{
-                color: '#A78BFA',
-                fontSize: '13px',
-                textDecoration: 'none',
-              }}
-            >
-              Mot de passe oublié ?
-            </a>
-          </p>
-        )}
+        <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '13px', color: 'rgba(255,255,255,0.45)' }}>
+          Pas encore de compte ?{' '}
+          <Link href="/inscription" style={{ color: '#A78BFA', textDecoration: 'underline', fontWeight: 600 }}>
+            Rejoindre la formation
+          </Link>
+        </p>
       </form>
 
-      <a
-        href="/"
-        style={{
-          color: '#71717A',
-          fontSize: '13px',
-          marginTop: '24px',
-          textDecoration: 'none',
-        }}
-      >
+      <Link href="/" style={{ color: '#71717A', fontSize: '13px', marginTop: '24px', textDecoration: 'none' }}>
         ← Retour à l'accueil
-      </a>
+      </Link>
     </main>
   )
+}
+
+const champStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '12px 14px',
+  background: 'rgba(255,255,255,0.06)',
+  border: '1px solid rgba(255,255,255,0.12)',
+  borderRadius: '10px',
+  color: '#fff',
+  fontSize: '15px',
+  outline: 'none',
+  boxSizing: 'border-box',
+}
+
+const boutonStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '14px',
+  background: 'linear-gradient(90deg, #A78BFA, #F472B6)',
+  border: 'none',
+  borderRadius: '12px',
+  color: '#fff',
+  fontSize: '16px',
+  fontWeight: 700,
+  cursor: 'pointer',
+}
+
+const erreurStyle: React.CSSProperties = {
+  background: 'rgba(244,114,182,0.1)',
+  border: '1px solid rgba(244,114,182,0.3)',
+  borderRadius: '8px',
+  padding: '12px',
+  marginBottom: '16px',
+  color: '#F472B6',
+  fontSize: '13px',
 }
