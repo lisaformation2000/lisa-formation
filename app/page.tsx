@@ -82,7 +82,15 @@ export default function Home() {
         >
           Commencer pour 147€
         </Link>
-        <p className="text-sm text-gray-400">Paiement unique — Accès à vie</p>
+        <p className="text-sm text-gray-400 mb-6">Paiement unique — Accès à vie</p>
+
+        {/* Bouton session découverte */}
+        <Link
+          href="/login?next=/session/0&mode=decouverte"
+          className="text-sm text-purple-300 border border-purple-400 rounded-full px-6 py-2 hover:bg-purple-400 hover:text-white transition"
+        >
+          ✨ Essayer la session découverte gratuite
+        </Link>
       </div>
 
       {/* Ce que tu vas maîtriser */}
@@ -119,7 +127,6 @@ export default function Home() {
 
         </div>
 
-        {/* Petits points séparateur */}
         <div className="flex gap-2 mt-10">
           <span className="w-2 h-2 rounded-full bg-pink-400 inline-block"></span>
           <span className="w-2 h-2 rounded-full bg-purple-400 inline-block"></span>
