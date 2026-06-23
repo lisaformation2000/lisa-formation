@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function CGV() {
     return (
       <main className="min-h-screen bg-[#070014] text-white px-6 py-16 max-w-4xl mx-auto">
@@ -16,7 +18,7 @@ export default function CGV() {
             <p><span className="text-white font-medium">SIRET :</span> 10586431800016</p>
             <p><span className="text-white font-medium">Code APE :</span> 85.59A — Autres enseignements</p>
             <p><span className="text-white font-medium">Adresse :</span> 935 Route de la Vy de l'Eau, 74140 Saint-Cergues, France</p>
-            <p><span className="text-white font-medium">Email :</span> lisaformationia@gmail.com</p>
+            <p><span className="text-white font-medium">Email :</span> contact@formationlisa.fr</p>
             <p><span className="text-white font-medium">Site :</span> formationlisa.fr</p>
           </div>
         </section>
@@ -45,7 +47,7 @@ export default function CGV() {
             </table>
           </div>
         </section>
-  
+
         <section className="mb-10">
           <h2 className="text-xl font-bold text-violet-300 mb-4">3. Prix</h2>
           <p className="text-gray-300 text-sm leading-relaxed mb-3">
@@ -104,11 +106,11 @@ export default function CGV() {
             <a href="/retractation" className="text-violet-300 underline hover:text-violet-200">
               notre formulaire de rétractation en ligne
             </a>
-            {" "}— accessible librement, sans création de compte — ou envoyer un email à lisaformationia@gmail.com avec le formulaire suivant :
+            {" "}— accessible librement, sans création de compte — ou envoyer un email à contact@formationlisa.fr avec le formulaire suivant :
           </p>
           <div className="bg-white/5 border border-white/10 rounded-xl p-6 text-gray-300 text-sm space-y-3">
             <p className="font-bold text-white">FORMULAIRE DE RÉTRACTATION</p>
-            <p>À envoyer à : <span className="text-violet-300">lisaformationia@gmail.com</span></p>
+            <p>À envoyer à : <span className="text-violet-300">contact@formationlisa.fr</span></p>
             <p>Je soussigné(e) [Prénom Nom] déclare exercer mon droit de rétractation concernant la formation LISA achetée le [date] pour un montant de [montant] euros.</p>
             <p>Signature : ___________________________ &nbsp;&nbsp;&nbsp; Date : _______________</p>
           </div>
@@ -162,9 +164,16 @@ export default function CGV() {
           </p>
           <p className="text-gray-400 text-xs">© Nadia Farfar — Lisa Formation IA — Tous droits réservés</p>
         </section>
+
+        <section className="mb-10">
+          <h2 className="text-xl font-bold text-violet-300 mb-4">14. Intelligence artificielle et création de contenu</h2>
+          <p className="text-gray-300 text-sm leading-relaxed">
+            Conformément au Règlement européen sur l'intelligence artificielle (IA Act, UE 2024/1689), il est précisé que certains contenus pédagogiques de la formation LISA ont été partiellement créés ou assistés par des outils d'intelligence artificielle. L'ensemble du contenu a été relu, validé et supervisé par Nadia Farfar avant publication.
+          </p>
+        </section>
   
         <section className="mb-10">
-          <h2 className="text-xl font-bold text-violet-300 mb-4">14. Données personnelles</h2>
+          <h2 className="text-xl font-bold text-violet-300 mb-4">15. Données personnelles</h2>
           <p className="text-gray-300 text-sm leading-relaxed">
             Le traitement de tes données personnelles est décrit dans notre{" "}
             <a href="/confidentialite" className="text-violet-300 underline hover:text-violet-200">
@@ -174,7 +183,7 @@ export default function CGV() {
         </section>
   
         <section className="mb-10">
-          <h2 className="text-xl font-bold text-violet-300 mb-4">15. Attestation de formation</h2>
+          <h2 className="text-xl font-bold text-violet-300 mb-4">16. Attestation de formation</h2>
           <p className="text-gray-300 text-sm leading-relaxed mb-2">
             Une attestation de formation est délivrée automatiquement à l'issue de la session 30.
           </p>
@@ -184,9 +193,9 @@ export default function CGV() {
         </section>
   
         <section className="mb-10">
-          <h2 className="text-xl font-bold text-violet-300 mb-4">16. Médiation et litiges</h2>
+          <h2 className="text-xl font-bold text-violet-300 mb-4">17. Médiation et litiges</h2>
           <p className="text-gray-300 text-sm leading-relaxed mb-3">
-            En cas de litige, une solution amiable sera privilégiée. Contacte d'abord lisaformationia@gmail.com. Les présentes CGV sont soumises au droit français.
+            En cas de litige, une solution amiable sera privilégiée. Contacte d'abord contact@formationlisa.fr. Les présentes CGV sont soumises au droit français.
           </p>
           <p className="text-gray-300 text-sm leading-relaxed mb-2">
             En cas d'échec de la réclamation amiable, tu peux recourir gratuitement au service de médiation :
