@@ -22,6 +22,7 @@ export default function DecouvertePage() {
       setError('Merci de remplir tous les champs.')
       return
     }
+
     if (motDePasse.length < 8) {
       setError('Le mot de passe doit contenir au moins 8 caractères.')
       return
@@ -35,28 +36,11 @@ export default function DecouvertePage() {
     })
 
     if (signUpError) {
-      if (signUpError.message.includes('already registered') || signUpError.message.includes('User already registered')) {
-        const { error: loginError } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password: motDePasse,
-        })
-        if (loginError) {
-          setError('Un compte existe déjà avec cet email. Vérifie ton mot de passe.')
-          setLoading(false)
-          return
-        }
-        router.push('/session/0')
-        return
-      }
-      setError('Une erreur est survenue. Réessaie.')
+      console.error('Erreur inscription Supabase:', signUpError)
+      setError(signUpError.message)
       setLoading(false)
       return
     }
-
-    await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password: motDePasse,
-    })
 
     router.push('/session/0')
   }
@@ -119,6 +103,7 @@ export default function DecouvertePage() {
             style={inputStyle}
             autoComplete="email"
           />
+
           <input
             type="password"
             placeholder="Choisis un mot de passe (8 caractères min.)"
@@ -128,9 +113,7 @@ export default function DecouvertePage() {
             autoComplete="new-password"
           />
 
-          {error && (
-            <p style={erreurStyle}>⚠️ {error}</p>
-          )}
+          {error && <p style={erreurStyle}>⚠️ {error}</p>}
 
           <button type="submit" disabled={loading} style={{ ...boutonStyle, opacity: loading ? 0.6 : 1 }}>
             {loading ? 'Chargement…' : '✨ Accéder à la session découverte'}
@@ -155,7 +138,8 @@ export default function DecouvertePage() {
           }}
         >
           <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
-            Après la session découverte, tu pourras rejoindre la formation complète pour <strong style={{ color: '#F472B6' }}>147€</strong> — paiement unique, accès à vie.
+            Après la session découverte, tu pourras rejoindre la formation complète pour{' '}
+            <strong style={{ color: '#F472B6' }}>147€</strong> — paiement unique, accès à vie.
           </p>
         </div>
       </div>
