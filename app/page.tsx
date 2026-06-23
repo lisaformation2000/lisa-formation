@@ -86,7 +86,7 @@ export default function Home() {
 
         {/* Bouton session découverte */}
         <Link
-          href="/login?next=/session/0&mode=decouverte"
+          href="/decouverte"
           className="text-sm text-purple-300 border border-purple-400 rounded-full px-6 py-2 hover:bg-purple-400 hover:text-white transition"
         >
           ✨ Essayer la session découverte gratuite
