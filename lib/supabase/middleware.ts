@@ -1,13 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-/**
- * Rafraîchit la session Supabase à chaque requête (nécessaire en App Router
- * pour que les Server Components voient toujours un utilisateur à jour),
- * puis applique les règles d'accès :
- *  - /dashboard et /session/* nécessitent d'être connecté
- *  - /session/* (hors session 0, gratuite) nécessite en plus d'avoir payé
- */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -19,7 +12,7 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
@@ -37,7 +30,6 @@ export async function updateSession(request: NextRequest) {
   const isSession = path.startsWith('/session')
   const isFreeSession = path === '/session/0' || path.startsWith('/session/0/')
 
-  // Pas connecté → on protège dashboard et sessions payantes
   if (!user && (isDashboard || (isSession && !isFreeSession))) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
@@ -45,7 +37,6 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Connecté mais pas encore payé → on bloque les sessions payantes (1 à 30)
   if (user && isSession && !isFreeSession) {
     const { data: profile } = await supabase
       .from('user_profile')
