@@ -170,7 +170,6 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       const sessionId = parseInt(id)
       const isFreeSession = sessionId === 0
 
-      // Session 0 : accessible sans compte
       if (!user && !isFreeSession) {
         router.push('/login')
         return
@@ -187,7 +186,6 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       if (error || !data) { router.push('/dashboard'); return }
       setSession(data)
 
-      // Progression : seulement si connecté
       if (user) {
         const { data: progress } = await supabase
           .from('user_progress').select('*')
@@ -245,7 +243,10 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
 
       <nav style={{ backgroundColor: '#000000', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button onClick={() => router.push('/dashboard')} style={{ color: '#A78BFA', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.95rem' }}>← Retour au dashboard</button>
-        <span style={{ color: '#67E8F9', fontSize: '0.85rem' }}>Session {currentId === 0 ? 'Découverte' : currentId} / 30</span>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <button onClick={() => router.push('/programme')} style={{ color: '#67E8F9', background: 'none', border: '1px solid #67E8F9', borderRadius: '8px', padding: '6px 14px', cursor: 'pointer', fontSize: '0.85rem' }}>📋 Programme</button>
+          <span style={{ color: '#67E8F9', fontSize: '0.85rem' }}>Session {currentId === 0 ? 'Découverte' : currentId} / 30</span>
+        </div>
       </nav>
 
       <div style={{ maxWidth: '820px', margin: '0 auto', padding: '36px 20px' }}>
@@ -274,7 +275,6 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
 
           return (
             <div key={index} style={{ marginBottom: '48px' }}>
-
               <h2 style={{ display: 'flex', alignItems: 'baseline', gap: '12px', fontSize: '1.35rem', fontWeight: 700, marginBottom: '18px' }}>
                 <span style={{ color: '#F472B6', fontWeight: 800 }}>{pNumero}.</span>
                 <span style={{ color: '#ffffff' }}>{pTitre}</span>
@@ -288,41 +288,31 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
               {!Array.isArray(part.blocs) && (
                 <>
                   {part.contenu && <p style={{ color: '#e2e8f0', lineHeight: 1.8, marginBottom: '18px', whiteSpace: 'pre-wrap' }}>{part.contenu}</p>}
-
                   {part.note && (
                     <div style={{ borderLeft: '3px solid #A78BFA', borderRadius: '8px', padding: '14px 18px', marginBottom: '16px', backgroundColor: 'rgba(167,139,250,0.08)' }}>
                       <p style={{ color: '#c4b5fd', fontSize: '0.9rem', margin: 0, lineHeight: 1.7, fontStyle: 'italic' }}>{part.note}</p>
                     </div>
                   )}
-
                   {part.alerte && (
                     <div style={{ border: '1px solid #67E8F9', borderRadius: '8px', padding: '14px 18px', marginBottom: '16px', backgroundColor: 'rgba(103,232,249,0.06)' }}>
                       <p style={{ color: '#67E8F9', fontSize: '0.9rem', margin: 0, lineHeight: 1.7, fontStyle: 'italic' }}>⚠ {part.alerte}</p>
                     </div>
                   )}
-
                   {(part.capacites || []).length > 0 && (
                     <VueTableau lignes={(part.capacites || []).map((cap: any) => normaliserLigne(cap))} />
                   )}
-
                   {(part.limites || []).length > 0 && (
                     <VueTableau lignes={(part.limites || []).map((lim: any) => normaliserLigne(lim))} />
                   )}
-
                   {(part.outils || []).length > 0 && <VueOutils items={part.outils} />}
-
                   {part.appareils_titre && <h3 style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 700, margin: '24px 0 14px' }}>{part.appareils_titre}</h3>}
-
                   {(part.appareils || []).length > 0 && <VueAppareils items={part.appareils} />}
-
                   {(part.prompts || []).length > 0 && (
                     <VuePrompts items={part.prompts} keyPrefix={`${index}-legacy`} copied={copied} onCopy={copier} />
                   )}
-
                   {(part.checklist || []).length > 0 && <VueChecklist items={part.checklist} />}
                 </>
               )}
-
             </div>
           )
         })}
@@ -337,9 +327,13 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         <div style={{ textAlign: 'center', margin: '40px 0' }}>
           {completed ? (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#3DDC84', fontSize: '1rem', fontWeight: 600 }}>✅ Session complétée !</div>
-          ) : (
+          ) : userId ? (
             <button onClick={markComplete} disabled={marking} style={{ background: 'linear-gradient(135deg, #A78BFA, #F472B6)', color: 'white', border: 'none', borderRadius: '8px', padding: '14px 32px', fontSize: '1rem', fontWeight: 600, cursor: marking ? 'not-allowed' : 'pointer', opacity: marking ? 0.7 : 1 }}>
               {marking ? 'Enregistrement...' : '✓ Marquer comme complétée'}
+            </button>
+          ) : (
+            <button onClick={() => router.push('/decouverte')} style={{ background: 'linear-gradient(135deg, #A78BFA, #F472B6)', color: 'white', border: 'none', borderRadius: '8px', padding: '14px 32px', fontSize: '1rem', fontWeight: 600, cursor: 'pointer' }}>
+              ✨ Rejoindre la formation — 147€
             </button>
           )}
         </div>

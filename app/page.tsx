@@ -82,14 +82,20 @@ export default function Home() {
         >
           Commencer pour 147€
         </Link>
-        <p className="text-sm text-gray-400 mb-6">Paiement unique — Accès à vie</p>
+        <p className="text-sm text-gray-400 mb-4">Paiement unique — Accès à vie</p>
 
-        {/* Bouton session découverte */}
         <Link
           href="/decouverte"
-          className="text-sm text-purple-300 border border-purple-400 rounded-full px-6 py-2 hover:bg-purple-400 hover:text-white transition"
+          className="text-sm text-purple-300 border border-purple-400 rounded-full px-6 py-2 hover:bg-purple-400 hover:text-white transition mb-3"
         >
           ✨ Essayer la session découverte gratuite
+        </Link>
+
+        <Link
+          href="/programme"
+          className="text-sm text-cyan-300 border border-cyan-400 rounded-full px-6 py-2 hover:bg-cyan-400 hover:text-white transition"
+        >
+          📋 Découvrir le programme complet
         </Link>
       </div>
 
