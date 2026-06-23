@@ -155,25 +155,31 @@ export default function DashboardPage() {
           currentUser.user_metadata?.prenom || currentUser.email?.split("@")[0] || ""
         );
 
-        const { data: profile, error: profileError } = await supabase
+        // Paiement : table profiles, colonne is_paid
+        const { data: profilePaid } = await supabase
+          .from("profiles")
+          .select("is_paid")
+          .eq("id", currentUser.id)
+          .maybeSingle();
+
+        setHasPaid(Boolean(profilePaid?.is_paid));
+
+        // Appareil préféré : table user_profile
+        const { data: profileAppareil } = await supabase
           .from("user_profile")
-          .select("appareil_prefere, has_paid")
+          .select("appareil_prefere")
           .eq("user_id", currentUser.id)
           .maybeSingle();
 
-        if (!profileError) {
-          setHasPaid(Boolean(profile?.has_paid));
-
-          if (profile?.appareil_prefere) {
-            const appareilSauvegarde = normaliserAppareil(profile.appareil_prefere);
-            if (appareilSauvegarde.length > 0) {
-              setAppareil(appareilSauvegarde);
-            } else {
-              setShowAppareil(true);
-            }
+        if (profileAppareil?.appareil_prefere) {
+          const appareilSauvegarde = normaliserAppareil(profileAppareil.appareil_prefere);
+          if (appareilSauvegarde.length > 0) {
+            setAppareil(appareilSauvegarde);
           } else {
             setShowAppareil(true);
           }
+        } else {
+          setShowAppareil(true);
         }
 
         const { data: prog, error: progressError } = await supabase
