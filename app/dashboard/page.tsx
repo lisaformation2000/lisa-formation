@@ -66,12 +66,14 @@ function normaliserAppareil(value: unknown): string[] {
 
 function AppareilSelector({
   appareils,
+  initial,
   onValider,
 }: {
   appareils: { id: string; label: string }[];
+  initial: string[];
   onValider: (s: string[]) => void;
 }) {
-  const [selection, setSelection] = useState<string[]>([]);
+  const [selection, setSelection] = useState<string[]>(initial);
 
   return (
     <div>
@@ -155,29 +157,18 @@ export default function DashboardPage() {
           currentUser.user_metadata?.prenom || currentUser.email?.split("@")[0] || ""
         );
 
-        // Paiement : table profiles, colonne is_paid
-        const { data: profilePaid } = await supabase
+        // Paiement + appareil : table profiles
+        const { data: profile } = await supabase
           .from("profiles")
-          .select("is_paid")
+          .select("is_paid, appareil_prefere")
           .eq("id", currentUser.id)
           .maybeSingle();
 
-        setHasPaid(Boolean(profilePaid?.is_paid));
+        setHasPaid(Boolean(profile?.is_paid));
 
-        // Appareil préféré : table user_profile
-        const { data: profileAppareil } = await supabase
-          .from("user_profile")
-          .select("appareil_prefere")
-          .eq("user_id", currentUser.id)
-          .maybeSingle();
-
-        if (profileAppareil?.appareil_prefere) {
-          const appareilSauvegarde = normaliserAppareil(profileAppareil.appareil_prefere);
-          if (appareilSauvegarde.length > 0) {
-            setAppareil(appareilSauvegarde);
-          } else {
-            setShowAppareil(true);
-          }
+        const appareilSauvegarde = normaliserAppareil(profile?.appareil_prefere);
+        if (appareilSauvegarde.length > 0) {
+          setAppareil(appareilSauvegarde);
         } else {
           setShowAppareil(true);
         }
@@ -211,10 +202,10 @@ export default function DashboardPage() {
     setAppareil(selection);
     setShowAppareil(false);
 
-    const { error } = await supabase.from("user_profile").upsert(
-      { user_id: user.id, appareil_prefere: JSON.stringify(selection) },
-      { onConflict: "user_id" }
-    );
+    const { error } = await supabase
+      .from("profiles")
+      .update({ appareil_prefere: JSON.stringify(selection) })
+      .eq("id", user.id);
 
     if (error) console.error("Erreur sauvegarde appareil :", error);
   };
@@ -374,7 +365,11 @@ export default function DashboardPage() {
             <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginBottom: "20px" }}>
               Tu pourras modifier ce choix à tout moment.
             </p>
-            <AppareilSelector appareils={appareils} onValider={sauvegarderAppareil} />
+            <AppareilSelector
+              appareils={appareils}
+              initial={appareil}
+              onValider={sauvegarderAppareil}
+            />
           </div>
         )}
 
