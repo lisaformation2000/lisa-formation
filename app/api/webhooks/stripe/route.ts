@@ -3,7 +3,9 @@ import Stripe from 'stripe'
 import { createAdminClient } from '@/lib/supabase/server'
 import { envoyerEmailBienvenue } from '@/lib/email'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!)
+}
 
 /**
  * IMPORTANT : Stripe signe le corps BRUT de la requête. Il ne faut donc jamais
@@ -11,6 +13,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
  * correspondra plus et Stripe sera systématiquement rejeté (erreur fréquente).
  */
 export async function POST(request: NextRequest) {
+  const stripe = getStripe()
   const rawBody = await request.text()
   const signature = request.headers.get('stripe-signature')
 
@@ -38,18 +41,18 @@ export async function POST(request: NextRequest) {
     const supabaseAdmin = createAdminClient()
 
     const { error: profileError } = await supabaseAdmin
-      .from('user_profile')
+      .from('profiles')
       .update({
-        has_paid: true,
+        is_paid: true,
         paid_at: new Date().toISOString(),
         stripe_customer_id: typeof session.customer === 'string' ? session.customer : null,
         stripe_checkout_session_id: session.id,
         retractation_waived: session.metadata?.retractation_waived === 'true',
       })
-      .eq('user_id', userId)
+      .eq('id', userId)
 
     if (profileError) {
-      console.error('Erreur mise à jour user_profile :', profileError)
+      console.error('Erreur mise à jour profiles :', profileError)
     }
 
     const { error: orderError } = await supabaseAdmin.from('orders').insert({

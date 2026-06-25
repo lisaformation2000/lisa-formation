@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@/lib/supabase/server'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!)
+}
 
 /**
  * Crée une session Stripe Checkout pour l'utilisateur connecté et renvoie l'URL
@@ -33,16 +35,17 @@ export async function POST(request: NextRequest) {
 
   // Évite de payer deux fois si déjà à jour
   const { data: profile } = await supabase
-    .from('user_profile')
-    .select('has_paid, stripe_customer_id')
-    .eq('user_id', user.id)
+    .from('profiles')
+    .select('is_paid, stripe_customer_id')
+    .eq('id', user.id)
     .maybeSingle()
 
-  if (profile?.has_paid) {
+  if (profile?.is_paid) {
     return NextResponse.json({ alreadyPaid: true })
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || request.nextUrl.origin
+  const stripe = getStripe()
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
