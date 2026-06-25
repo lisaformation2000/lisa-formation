@@ -7,6 +7,20 @@ import { createClient } from '@/lib/supabase/client'
 
 const supabase = createClient()
 
+function normaliserAppareil(value: unknown): string[] {
+  if (!value) return []
+  if (Array.isArray(value)) return value.filter((item) => typeof item === 'string')
+  if (typeof value === 'string') {
+    try {
+      const parsed = JSON.parse(value)
+      return Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string') : []
+    } catch {
+      return []
+    }
+  }
+  return []
+}
+
 const APP_LOGOS: Record<string, React.ReactNode> = {
   windows: (
     <svg viewBox="0 0 120 120" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -101,10 +115,18 @@ function logoPourCle(key: string): React.ReactNode {
   return APP_LOGOS[key] || APP_LOGOS.mac
 }
 
-function VueAppareils({ items }: { items: any[] }) {
+function VueAppareils({ items, filtre }: { items: any[]; filtre: string[] }) {
+  const normFiltre = filtre.map((f) => (f === 'apple' ? 'mac' : f))
+  const visibles = normFiltre.length > 0
+    ? items.filter((app: any) => {
+        const k = (app.logo || '').toLowerCase()
+        return normFiltre.includes(k === 'apple' ? 'mac' : k)
+      })
+    : items
+  const aAfficher = visibles.length > 0 ? visibles : items
   return (
     <>
-      {items.map((app: any, i: number) => {
+      {aAfficher.map((app: any, i: number) => {
         const key = (app.logo || '').toLowerCase()
         const st = APP_STYLE[key] || { couleur: '#A78BFA' }
         return (
@@ -207,7 +229,7 @@ function VueTableau({ lignes }: { lignes: any[] }) {
   )
 }
 
-function VueBloc({ bloc, partIndex, blocIndex, copied, onCopy }: { bloc: any; partIndex: number; blocIndex: number; copied: string | null; onCopy: (t: string, k: string) => void }) {
+function VueBloc({ bloc, partIndex, blocIndex, copied, onCopy, filtreAppareil }: { bloc: any; partIndex: number; blocIndex: number; copied: string | null; onCopy: (t: string, k: string) => void; filtreAppareil: string[] }) {
   switch (bloc.type) {
     case 'texte':
       return <p style={{ color: '#e2e8f0', lineHeight: 1.8, marginBottom: '18px', whiteSpace: 'pre-wrap' }}>{bloc.texte}</p>
@@ -226,7 +248,7 @@ function VueBloc({ bloc, partIndex, blocIndex, copied, onCopy }: { bloc: any; pa
     case 'appareils_titre':
       return <h3 style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 700, margin: '24px 0 14px' }}>{bloc.texte}</h3>
     case 'appareils':
-      return <VueAppareils items={bloc.items || []} />
+      return <VueAppareils items={bloc.items || []} filtre={filtreAppareil} />
     case 'outils':
       return <VueOutils items={bloc.items || []} />
     case 'prompts':
@@ -249,6 +271,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   const [marking, setMarking] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
+  const [filtreAppareil, setFiltreAppareil] = useState<string[]>([])
 
   useEffect(() => {
     const init = async () => {
@@ -261,7 +284,15 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         return
       }
 
-      if (user) setUserId(user.id)
+      if (user) {
+        setUserId(user.id)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('appareil_prefere')
+          .eq('id', user.id)
+          .maybeSingle()
+        setFiltreAppareil(normaliserAppareil(profile?.appareil_prefere))
+      }
 
       const isSlug = isNaN(sessionId)
       const query = supabase.from('sessions_content').select('*')
@@ -368,7 +399,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
               </h2>
 
               {Array.isArray(part.blocs) && part.blocs.map((bloc: any, bi: number) => (
-                <VueBloc key={bi} bloc={bloc} partIndex={index} blocIndex={bi} copied={copied} onCopy={copier} />
+                <VueBloc key={bi} bloc={bloc} partIndex={index} blocIndex={bi} copied={copied} onCopy={copier} filtreAppareil={filtreAppareil} />
               ))}
 
               {!Array.isArray(part.blocs) && (
@@ -392,7 +423,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
                   )}
                   {(part.outils || []).length > 0 && <VueOutils items={part.outils} />}
                   {part.appareils_titre && <h3 style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 700, margin: '24px 0 14px' }}>{part.appareils_titre}</h3>}
-                  {(part.appareils || []).length > 0 && <VueAppareils items={part.appareils} />}
+                  {(part.appareils || []).length > 0 && <VueAppareils items={part.appareils} filtre={filtreAppareil} />}
                   {(part.prompts || []).length > 0 && (
                     <VuePrompts items={part.prompts} keyPrefix={`${index}-legacy`} copied={copied} onCopy={copier} />
                   )}
