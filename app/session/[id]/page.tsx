@@ -237,7 +237,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   return (
     <div style={{ backgroundColor: '#070014', minHeight: '100vh', fontFamily: 'sans-serif' }}>
 
-      <div style={{ backgroundColor: '#000000', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '24px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div onClick={() => router.push('/')} style={{ backgroundColor: '#000000', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '24px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', cursor: 'pointer' }}>
         <img src="/logo-lisa.png" alt="LISA" style={{ maxWidth: '400px', width: '70%', height: 'auto' }} />
       </div>
 
