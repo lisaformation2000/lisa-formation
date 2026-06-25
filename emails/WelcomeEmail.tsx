@@ -35,17 +35,16 @@ export default function WelcomeEmail({ prenom, siteUrl }: WelcomeEmailProps) {
       <Head />
       <Preview>Bienvenue dans LISA — ton accès est prêt, direction la Session 1.</Preview>
       <Body style={{ backgroundColor: couleurs.fond, fontFamily: 'Helvetica, Arial, sans-serif', margin: 0, padding: 0 }}>
-        <Container style={{ maxWidth: '480px', margin: '0 auto' }}>
-          {/* Bandeau logo */}
-          <Section style={{ backgroundColor: couleurs.bandeau, textAlign: 'center', padding: '24px 0' }}>
-            <Img
-              src={`${siteUrl}/logo-lisa.png`}
-              alt="LISA — La formation pour débuter avec l'IA"
-              width="160"
-              style={{ margin: '0 auto', display: 'block' }}
-            />
-          </Section>
+        <Section style={{ backgroundColor: couleurs.bandeau, width: '100%', textAlign: 'center', padding: '28px 0' }}>
+          <Img
+            src={`${siteUrl}/logo-lisa.png`}
+            alt="LISA — La formation pour débuter avec l'IA"
+            width="260"
+            style={{ margin: '0 auto', display: 'block', maxWidth: '80%', height: 'auto' }}
+          />
+        </Section>
 
+        <Container style={{ maxWidth: '480px', margin: '0 auto' }}>
           <Section style={{ padding: '36px 28px 8px' }}>
             <Heading style={{ color: '#ffffff', fontSize: '22px', fontWeight: 800, margin: '0 0 8px' }}>
               Bienvenue, {prenomAffiche} 🎉
