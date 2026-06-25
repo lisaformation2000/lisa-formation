@@ -7,12 +7,98 @@ import { createClient } from '@/lib/supabase/client'
 
 const supabase = createClient()
 
-const APP_STYLE: Record<string, { couleur: string; bg: string; logo: string }> = {
-  windows: { couleur: '#00C8FF', bg: '#00C8FF', logo: '⊞' },
-  apple:   { couleur: '#A78BFA', bg: '#A78BFA', logo: '' },
-  mac:     { couleur: '#A78BFA', bg: '#A78BFA', logo: '' },
-  iphone:  { couleur: '#F472B6', bg: '#F472B6', logo: '▢' },
-  android: { couleur: '#3DDC84', bg: '#3DDC84', logo: '🤖' },
+const APP_LOGOS: Record<string, React.ReactNode> = {
+  windows: (
+    <svg viewBox="0 0 120 120" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="winGrad" cx="38%" cy="32%" r="70%">
+          <stop offset="0%" stopColor="#33B5F5" />
+          <stop offset="100%" stopColor="#0078D4" />
+        </radialGradient>
+      </defs>
+      <circle cx="60" cy="60" r="54" fill="url(#winGrad)" />
+      <g fill="white">
+        <path d="M36,42 L57,39 L57,58 L36,58 Z" />
+        <path d="M61,38.5 L84,35 L84,58 L61,58 Z" />
+        <path d="M36,62 L57,62 L57,81 L36,78 Z" />
+        <path d="M61,62 L84,62 L84,85 L61,81.5 Z" />
+      </g>
+    </svg>
+  ),
+  mac: (
+    <svg viewBox="0 0 120 120" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="macGrad" cx="38%" cy="32%" r="70%">
+          <stop offset="0%" stopColor="#B9A6FB" />
+          <stop offset="100%" stopColor="#7C3AED" />
+        </radialGradient>
+      </defs>
+      <circle cx="60" cy="60" r="54" fill="url(#macGrad)" />
+      <g transform="translate(60,60) scale(0.062) translate(-512,-555)" fill="white">
+        <path d="M747.4,640.6c-1.2-119.9,97.8-177.5,102.3-180.2c-55.8-81.6-142.6-92.8-173.4-94c-73.8-7.5-144.1,43.4-181.6,43.4c-37.4,0-95-42.3-156.3-41.2c-80.4,1.2-154.5,46.7-195.9,118.6c-83.6,145-21.4,360,60,477.9c39.8,57.7,87.3,122.4,149.5,120.1c60-2.4,82.6-38.8,155.2-38.8c72.6,0,92.9,38.8,156.3,37.6c64.5-1.2,105.4-58.8,144.8-116.7c45.6-66.9,64.4-131.7,65.5-135C831.7,832.1,748.7,800.3,747.4,640.6z" />
+        <path d="M628.5,313.4c33.1-40.1,55.4-95.8,49.3-151.4c-47.6,1.9-105.3,31.7-139.5,71.8c-30.7,35.5-57.6,92.2-50.4,146.6C490.7,386.5,595.4,353.4,628.5,313.4z" />
+      </g>
+    </svg>
+  ),
+  iphone: (
+    <svg viewBox="0 0 120 120" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="iphGrad" cx="38%" cy="30%" r="72%">
+          <stop offset="0%" stopColor="#FBB6CE" />
+          <stop offset="55%" stopColor="#F472B6" />
+          <stop offset="100%" stopColor="#DB2777" />
+        </radialGradient>
+        <linearGradient id="screenSheen" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="white" stopOpacity="0.22" />
+          <stop offset="45%" stopColor="white" stopOpacity="0.04" />
+          <stop offset="100%" stopColor="white" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <circle cx="60" cy="60" r="54" fill="url(#iphGrad)" />
+      <rect x="43" y="30" width="34" height="60" rx="9.5" fill="white" />
+      <rect x="47" y="34" width="26" height="52" rx="6" fill="#EC4899" />
+      <rect x="47" y="34" width="26" height="52" rx="6" fill="url(#screenSheen)" />
+      <rect x="54" y="34" width="12" height="4.5" rx="2.25" fill="white" />
+      <rect x="54" y="81.5" width="12" height="2.6" rx="1.3" fill="white" />
+    </svg>
+  ),
+  android: (
+    <svg viewBox="0 0 120 120" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="andGrad" cx="38%" cy="30%" r="72%">
+          <stop offset="0%" stopColor="#6EE7A8" />
+          <stop offset="55%" stopColor="#3DDC84" />
+          <stop offset="100%" stopColor="#1FB866" />
+        </radialGradient>
+      </defs>
+      <circle cx="60" cy="60" r="54" fill="url(#andGrad)" />
+      <g fill="white">
+        <line x1="47" y1="38" x2="51.5" y2="45" stroke="white" strokeWidth="2.6" strokeLinecap="round" />
+        <line x1="73" y1="38" x2="68.5" y2="45" stroke="white" strokeWidth="2.6" strokeLinecap="round" />
+        <path d="M42,55 a18,18 0 0 1 36,0 Z" />
+        <circle cx="52" cy="49.5" r="2.1" fill="#3DDC84" />
+        <circle cx="68" cy="49.5" r="2.1" fill="#3DDC84" />
+        <rect x="42" y="58" width="36" height="26" rx="3" />
+        <rect x="33" y="58" width="6.5" height="22" rx="3.25" />
+        <rect x="80.5" y="58" width="6.5" height="22" rx="3.25" />
+        <rect x="49" y="82" width="6.5" height="16" rx="3.25" />
+        <rect x="64.5" y="82" width="6.5" height="16" rx="3.25" />
+      </g>
+    </svg>
+  ),
+}
+
+const APP_STYLE: Record<string, { couleur: string }> = {
+  windows: { couleur: '#00C8FF' },
+  apple:   { couleur: '#A78BFA' },
+  mac:     { couleur: '#A78BFA' },
+  iphone:  { couleur: '#F472B6' },
+  android: { couleur: '#3DDC84' },
+}
+
+function logoPourCle(key: string): React.ReactNode {
+  if (key === 'apple') return APP_LOGOS.mac
+  return APP_LOGOS[key] || APP_LOGOS.mac
 }
 
 function VueAppareils({ items }: { items: any[] }) {
@@ -20,11 +106,11 @@ function VueAppareils({ items }: { items: any[] }) {
     <>
       {items.map((app: any, i: number) => {
         const key = (app.logo || '').toLowerCase()
-        const st = APP_STYLE[key] || { couleur: '#A78BFA', bg: '#A78BFA', logo: '' }
+        const st = APP_STYLE[key] || { couleur: '#A78BFA' }
         return (
           <div key={i} style={{ border: `1px solid ${st.couleur}`, borderRadius: '12px', marginBottom: '14px', overflow: 'hidden', backgroundColor: 'rgba(255,255,255,0.02)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 18px', borderBottom: `1px solid ${st.couleur}33` }}>
-              <span style={{ width: '34px', height: '34px', borderRadius: '8px', backgroundColor: st.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', flexShrink: 0 }}>{st.logo}</span>
+              <span style={{ width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{logoPourCle(key)}</span>
               <span style={{ color: st.couleur, fontWeight: 700, fontSize: '1.05rem' }}>{app.nom}</span>
             </div>
             <div style={{ padding: '14px 18px' }}>
