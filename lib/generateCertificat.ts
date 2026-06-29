@@ -1,4 +1,4 @@
-import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib'
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import fs from 'fs'
 import path from 'path'
 
@@ -16,7 +16,6 @@ export async function generateCertificat(
 ): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create()
 
-  // Format paysage A4
   const page = pdfDoc.addPage([841.89, 595.28])
   const { width, height } = page.getSize()
 
@@ -33,42 +32,45 @@ export async function generateCertificat(
   // Fond noir
   page.drawRectangle({ x: 0, y: 0, width, height, color: BG })
 
-  // Charger image fond cosmique
+  // Fond image cosmique
   const bgPath = path.join(process.cwd(), 'public', 'certificat-bg.png')
   if (fs.existsSync(bgPath)) {
     const bgBytes = fs.readFileSync(bgPath)
     const bgImg = await pdfDoc.embedPng(bgBytes)
-    page.drawImage(bgImg, { x: 0, y: 0, width, height, opacity: 0.35 })
+    page.drawImage(bgImg, { x: 0, y: 0, width, height, opacity: 0.30 })
   }
 
-  // Charger logo LisA transparent
+  // Bordure violette extérieure
+  page.drawRectangle({
+    x: 18, y: 18, width: width - 36, height: height - 36,
+    borderColor: VIOLET, borderWidth: 1.5,
+    color: rgb(0, 0, 0), opacity: 0
+  })
+
+  // Bordure rose intérieure
+  page.drawRectangle({
+    x: 24, y: 24, width: width - 48, height: height - 48,
+    borderColor: PINK, borderWidth: 0.7,
+    color: rgb(0, 0, 0), opacity: 0
+  })
+
+  // Logo LisA
   const logoPath = path.join(process.cwd(), 'public', 'logo-lisa-certificat.png')
+  const logoW = 260
+  const logoH = 260
   if (fs.existsSync(logoPath)) {
     const logoBytes = fs.readFileSync(logoPath)
     const logoImg = await pdfDoc.embedPng(logoBytes)
-    const logoW = 280
-    const logoH = logoW * (480 / 600)
     page.drawImage(logoImg, {
       x: (width - logoW) / 2,
-      y: height - 40 - logoH,
+      y: height - 35 - logoH,
       width: logoW,
       height: logoH,
     })
   }
 
-  // Bordure violette
-  page.drawRectangle({
-    x: 18, y: 18, width: width - 36, height: height - 36,
-    borderColor: VIOLET, borderWidth: 1.5, color: rgb(0, 0, 0), opacity: 0
-  })
-  // Bordure rose intérieure
-  page.drawRectangle({
-    x: 24, y: 24, width: width - 48, height: height - 48,
-    borderColor: PINK, borderWidth: 0.7, color: rgb(0, 0, 0), opacity: 0
-  })
-
-  const logoH = 280 * (480 / 600)
-  let y = height - 40 - logoH - 20
+  // Position Y de départ après le logo
+  let y = height - 35 - logoH - 18
 
   // ATTESTATION DE FORMATION
   const titleText = 'ATTESTATION DE FORMATION'
@@ -85,7 +87,7 @@ export async function generateCertificat(
     end:   { x: (width + 180) / 2, y },
     color: VIOLET, thickness: 0.7
   })
-  y -= 40
+  y -= 42
 
   // Prénom Nom
   const fullName = `${prenom} ${nom}`.trim()
@@ -95,7 +97,7 @@ export async function generateCertificat(
     x: (width - nameW) / 2, y,
     size: nameSize, font: fontBold, color: PINK
   })
-  y -= 14
+  y -= 12
 
   // Ligne sous le nom
   const lineW = Math.min(nameW + 60, 360)
@@ -104,22 +106,22 @@ export async function generateCertificat(
     end:   { x: (width + lineW) / 2, y },
     color: PINK, thickness: 0.8
   })
-  y -= 20
+  y -= 18
 
   // a terminé avec succès
   const line1 = 'a terminé avec succès la formation complète'
   const line1W = fontNormal.widthOfTextAtSize(line1, 9)
   page.drawText(line1, {
     x: (width - line1W) / 2, y,
-    size: 9, font: fontNormal, color: rgb(1, 1, 1), opacity: 0.85
+    size: 9, font: fontNormal, color: WHITE, opacity: 0.85
   })
-  y -= 14
+  y -= 13
 
   const line2 = '30 sessions · 4 semaines · Environ 45 heures de formation'
   const line2W = fontNormal.widthOfTextAtSize(line2, 9)
   page.drawText(line2, {
     x: (width - line2W) / 2, y,
-    size: 9, font: fontNormal, color: rgb(1, 1, 1), opacity: 0.85
+    size: 9, font: fontNormal, color: WHITE, opacity: 0.85
   })
   y -= 22
 
@@ -133,51 +135,67 @@ export async function generateCertificat(
   y -= 20
 
   // Séparateur
+  const sepY = y
   page.drawLine({
-    start: { x: 80, y }, end: { x: width - 80, y },
+    start: { x: 80, y: sepY },
+    end:   { x: width - 80, y: sepY },
     color: VIOLET, thickness: 0.5
   })
-  y -= 14
 
-  // Bloc gauche : Nadia Farfar
+  // Bloc gauche — Nadia Farfar
   const leftX = width * 0.25
   const sigW = 120
   page.drawLine({
-    start: { x: leftX - sigW / 2, y },
-    end:   { x: leftX + sigW / 2, y },
+    start: { x: leftX - sigW / 2, y: sepY - 12 },
+    end:   { x: leftX + sigW / 2, y: sepY - 12 },
     color: VIOLET, thickness: 0.7
   })
-  y -= 12
   const nadiaW = fontNormal.widthOfTextAtSize('Nadia Farfar', 8)
   page.drawText('Nadia Farfar', {
-    x: leftX - nadiaW / 2, y,
+    x: leftX - nadiaW / 2, y: sepY - 22,
     size: 8, font: fontNormal, color: CYAN
   })
-  y -= 10
   const f1W = fontNormal.widthOfTextAtSize('Fondatrice — LISA Formation', 6.5)
   page.drawText('Fondatrice — LISA Formation', {
-    x: leftX - f1W / 2, y,
+    x: leftX - f1W / 2, y: sepY - 31,
     size: 6.5, font: fontNormal, color: WHITE, opacity: 0.45
   })
-  y -= 9
   const siretW = fontNormal.widthOfTextAtSize('SIRET 10586431800016', 6.5)
   page.drawText('SIRET 10586431800016', {
-    x: leftX - siretW / 2, y,
+    x: leftX - siretW / 2, y: sepY - 39,
     size: 6.5, font: fontNormal, color: WHITE, opacity: 0.45
   })
 
-  // Bloc droit : Signature
+  // Bloc droit — Signature
   const rightX = width * 0.75
-  const sepY = height - 40 - logoH - 20 - 10 - 40 - 14 - 14 - 22 - 20 - 20 - 14
   page.drawLine({
-    start: { x: rightX - sigW / 2, y: sepY - 14 },
-    end:   { x: rightX + sigW / 2, y: sepY - 14 },
+    start: { x: rightX - sigW / 2, y: sepY - 12 },
+    end:   { x: rightX + sigW / 2, y: sepY - 12 },
     color: PINK, thickness: 0.7
   })
   const sigTextW = fontNormal.widthOfTextAtSize('Signature', 7)
   page.drawText('Signature', {
-    x: rightX - sigTextW / 2, y: sepY - 26,
+    x: rightX - sigTextW / 2, y: sepY - 22,
     size: 7, font: fontNormal, color: WHITE, opacity: 0.45
+  })
+
+  // Badge central
+  const badgeY = sepY - 28
+  page.drawEllipse({
+    x: width / 2, y: badgeY,
+    xScale: 20, yScale: 20,
+    borderColor: YELLOW, borderWidth: 1.2,
+    color: rgb(0, 0, 0), opacity: 0
+  })
+  const badge1W = fontBold.widthOfTextAtSize('CERTIFIE', 6)
+  page.drawText('CERTIFIE', {
+    x: width / 2 - badge1W / 2, y: badgeY + 3,
+    size: 6, font: fontBold, color: YELLOW
+  })
+  const badge2W = fontBold.widthOfTextAtSize('2025-2026', 6)
+  page.drawText('2025-2026', {
+    x: width / 2 - badge2W / 2, y: badgeY - 6,
+    size: 6, font: fontBold, color: YELLOW
   })
 
   // Pied de page
