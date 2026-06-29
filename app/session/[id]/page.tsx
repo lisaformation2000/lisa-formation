@@ -216,43 +216,13 @@ function normaliserLigne(item: any): { cle: string; valeur: string } {
   return { cle: String(item ?? ''), valeur: '' }
 }
 
-function normaliserSommaireItem(item: any): { titre: string; duree?: string } {
-  if (typeof item === 'string') {
-    const match = item.match(/^(.+?)\s*(?:[—–·•]|\s-\s)\s*(.+)$/)
-    if (match) return { titre: match[1].trim(), duree: match[2].trim() }
-    return { titre: item }
-  }
-  if (Array.isArray(item)) {
-    return { titre: String(item[0] ?? ''), duree: item[1] ? String(item[1]) : undefined }
-  }
-  if (item && typeof item === 'object') {
-    return {
-      titre: item.titre || item.title || item.nom || String(item),
-      duree: item.duree || item.duration,
-    }
-  }
-  return { titre: String(item ?? '') }
-}
-
 function VueTableau({ lignes }: { lignes: any[] }) {
-  const rows = lignes.map(normaliserLigne)
   return (
-    <div className="mb-[18px]">
-      {rows.map((ligne, i) => (
-        <div key={i} className="border-b border-white/[0.06] py-2.5">
-          <div className="flex gap-2 md:hidden">
-            <span className="shrink-0 font-bold text-[#67E8F9] text-[0.9rem]">{i + 1}.</span>
-            <div className="min-w-0 flex-1">
-              <p className="font-semibold text-[#67E8F9] text-[0.9rem]">{ligne.cle}</p>
-              {ligne.valeur && (
-                <p className="mt-1 text-[#e2e8f0] text-[0.9rem] leading-relaxed">{ligne.valeur}</p>
-              )}
-            </div>
-          </div>
-          <div className="hidden gap-4 md:flex">
-            <span className="min-w-[180px] shrink-0 font-bold text-[#67E8F9] text-[0.9rem]">{ligne.cle}</span>
-            <span className="text-[#e2e8f0] text-[0.9rem]">{ligne.valeur}</span>
-          </div>
+    <div style={{ marginBottom: '18px' }}>
+      {lignes.map((ligne: any, i: number) => (
+        <div key={i} style={{ display: 'flex', gap: '16px', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <span style={{ color: '#67E8F9', fontWeight: 700, fontSize: '0.9rem', minWidth: '180px' }}>{ligne.cle}</span>
+          <span style={{ color: '#e2e8f0', fontSize: '0.9rem' }}>{ligne.valeur}</span>
         </div>
       ))}
     </div>
@@ -413,22 +383,15 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         {infos && <p style={{ color: '#67E8F9', fontSize: '0.88rem', marginBottom: '28px' }}>{infos}</p>}
         {!infos && duree && <p style={{ color: '#67E8F9', fontSize: '0.9rem', marginBottom: '28px' }}>⏱ {duree}</p>}
 
+        {/* Sommaire — corrigé mobile */}
         {sommaire.length > 0 && (
           <div style={{ backgroundColor: 'rgba(167,139,250,0.05)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '12px', padding: '20px 24px', marginBottom: '40px' }}>
-            <div className="space-y-3">
-              {sommaire.map((item, i) => {
-                const { titre, duree } = normaliserSommaireItem(item)
-                return (
-                  <div key={i} className="flex gap-2">
-                    <span className="shrink-0 font-bold text-[#F472B6]">{i + 1}.</span>
-                    <p className="min-w-0 flex-1 text-[#e2e8f0] text-[0.92rem] leading-snug">
-                      <span className="font-semibold">{titre}</span>
-                      {duree && <span className="text-[#67E8F9]"> · {duree}</span>}
-                    </p>
-                  </div>
-                )
-              })}
-            </div>
+            {sommaire.map((item, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', margin: '8px 0' }}>
+                <span style={{ color: '#F472B6', fontWeight: 700, flexShrink: 0, minWidth: '20px' }}>{i + 1}.</span>
+                <span style={{ color: '#e2e8f0', fontSize: '0.92rem', lineHeight: 1.5 }}>{item}</span>
+              </div>
+            ))}
           </div>
         )}
 
@@ -441,12 +404,10 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
 
           return (
             <div key={index} style={{ marginBottom: '48px' }}>
-              <h2 className="mb-[18px] flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[1.35rem] font-bold">
-                <span className="shrink-0 font-extrabold text-[#F472B6]">{pNumero}.</span>
-                <span className="min-w-0 text-white">
-                  {titreSansDouble}
-                  {part.duree && <span className="text-[#67E8F9] text-[0.8rem] font-normal"> · {part.duree}</span>}
-                </span>
+              <h2 style={{ display: 'flex', alignItems: 'baseline', gap: '12px', fontSize: '1.35rem', fontWeight: 700, marginBottom: '18px' }}>
+                <span style={{ color: '#F472B6', fontWeight: 800 }}>{pNumero}.</span>
+                <span style={{ color: '#ffffff' }}>{titreSansDouble}</span>
+                {part.duree && <span style={{ color: '#67E8F9', fontSize: '0.8rem', fontWeight: 400 }}>· {part.duree}</span>}
               </h2>
 
               {Array.isArray(part.blocs) && part.blocs.map((bloc: any, bi: number) => (
