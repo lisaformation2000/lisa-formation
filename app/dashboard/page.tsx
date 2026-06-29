@@ -104,7 +104,6 @@ function AppareilSelector({
           </button>
         ))}
       </div>
-
       <button
         onClick={() => onValider(selection)}
         disabled={selection.length === 0}
@@ -136,7 +135,7 @@ export default function DashboardPage() {
   const [prenom, setPrenom] = useState("");
   const [hasPaid, setHasPaid] = useState(false);
   const [appareil, setAppareil] = useState<string[]>([]);
-  const [progress, setProgress] = useState<Record<number, string>>({});
+  const [progress, setProgress] = useState<Record<number, boolean>>({});
   const [showAppareil, setShowAppareil] = useState(false);
   const [loading, setLoading] = useState(true);
   const [genCertificat, setGenCertificat] = useState(false);
@@ -157,7 +156,6 @@ export default function DashboardPage() {
           currentUser.user_metadata?.prenom || currentUser.email?.split("@")[0] || ""
         );
 
-        // Paiement + appareil : table profiles
         const { data: profile } = await supabase
           .from("profiles")
           .select("is_paid, appareil_prefere")
@@ -173,16 +171,17 @@ export default function DashboardPage() {
           setShowAppareil(true);
         }
 
+        // ── Progression depuis session_progress ──
         const { data: prog, error: progressError } = await supabase
-          .from("user_progress")
-          .select("session_id, statut")
+          .from("session_progress")
+          .select("session_id, completed")
           .eq("user_id", currentUser.id);
 
         if (!progressError && prog) {
-          const map: Record<number, string> = {};
+          const map: Record<number, boolean> = {};
           prog.forEach((p: any) => {
-            if (p.session_id !== undefined && p.statut) {
-              map[p.session_id] = p.statut;
+            if (p.session_id !== undefined) {
+              map[p.session_id] = Boolean(p.completed);
             }
           });
           setProgress(map);
@@ -201,21 +200,16 @@ export default function DashboardPage() {
     if (!user) return;
     setAppareil(selection);
     setShowAppareil(false);
-
-    const { error } = await supabase
+    await supabase
       .from("profiles")
       .update({ appareil_prefere: JSON.stringify(selection) })
       .eq("id", user.id);
-
-    if (error) console.error("Erreur sauvegarde appareil :", error);
   };
 
-  const sessionsTerminees = Object.values(progress).filter((s) => s === "terminee").length;
+  const sessionsTerminees = Object.values(progress).filter(Boolean).length;
   const formationTerminee = sessionsTerminees >= 30;
 
-  const prochaineSession = sessions.find(
-    (s) => !progress[s.id] || progress[s.id] === "a_faire"
-  );
+  const prochaineSession = sessions.find((s) => !progress[s.id]);
 
   const handleDeconnexion = async () => {
     await supabase.auth.signOut();
@@ -223,21 +217,10 @@ export default function DashboardPage() {
   };
 
   const telechargerCertificat = async () => {
+    if (!user) return;
     setGenCertificat(true);
     try {
-      const res = await fetch("/api/certificate");
-      if (!res.ok) throw new Error("Erreur génération certificat");
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "Attestation-LISA.pdf";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error(e);
+      window.open(`/api/certificat?userId=${user.id}`, '_blank');
     } finally {
       setGenCertificat(false);
     }
@@ -245,60 +228,37 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <main
-        style={{
-          backgroundColor: "#070014",
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'Inter', sans-serif" }}>
-          Chargement...
-        </p>
+      <main style={{ backgroundColor: "#070014", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'Inter', sans-serif" }}>Chargement...</p>
       </main>
     );
   }
 
   return (
-    <main
-      style={{
-        backgroundColor: "#070014",
-        minHeight: "100vh",
-        color: "#ffffff",
-        fontFamily: "'Inter', sans-serif",
-      }}
-    >
-      <nav
-        style={{
-          backgroundColor: "#000000",
-          padding: "16px 24px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
-        }}
-      >
+    <main style={{ backgroundColor: "#070014", minHeight: "100vh", color: "#ffffff", fontFamily: "'Inter', sans-serif" }}>
+      <nav style={{ backgroundColor: "#000000", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <Link href="/" style={{ textDecoration: "none" }}>
           <img src="/logoLisa.webp" alt="LISA" style={{ height: "120px", width: "auto" }} />
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <span style={{ fontSize: "14px", color: "rgba(255,255,255,0.6)" }}>
-            Bonjour {prenom} 👋
-          </span>
-          <button
-            onClick={handleDeconnexion}
-            style={{
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: "8px",
-              padding: "8px 16px",
-              fontSize: "13px",
+          {/* ── Bonjour Nadia → cliquable vers /compte ── */}
+          <Link href="/compte" style={{ textDecoration: "none" }}>
+            <span style={{
+              fontSize: "14px",
               color: "rgba(255,255,255,0.6)",
               cursor: "pointer",
-            }}
+              padding: "6px 12px",
+              borderRadius: "8px",
+              border: "1px solid rgba(255,255,255,0.08)",
+              transition: "all 0.2s",
+            }}>
+              Bonjour {prenom} 👋
+            </span>
+          </Link>
+          <button
+            onClick={handleDeconnexion}
+            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", color: "rgba(255,255,255,0.6)", cursor: "pointer" }}
           >
             Déconnexion
           </button>
@@ -306,43 +266,15 @@ export default function DashboardPage() {
       </nav>
 
       <div style={{ maxWidth: "800px", margin: "0 auto", padding: "40px 24px" }}>
+
         {!hasPaid && (
-          <div
-            style={{
-              background: "rgba(244,114,182,0.08)",
-              border: "1px solid rgba(244,114,182,0.25)",
-              borderRadius: "16px",
-              padding: "24px 28px",
-              marginBottom: "32px",
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "16px",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
+          <div style={{ background: "rgba(244,114,182,0.08)", border: "1px solid rgba(244,114,182,0.25)", borderRadius: "16px", padding: "24px 28px", marginBottom: "32px", display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "space-between", alignItems: "center" }}>
             <div>
-              <p style={{ fontWeight: 700, fontSize: "15px", marginBottom: "4px" }}>
-                Accès limité à la Session Découverte
-              </p>
-              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
-                Débloque les 30 sessions complètes pour 147€ — paiement unique, accès à vie.
-              </p>
+              <p style={{ fontWeight: 700, fontSize: "15px", marginBottom: "4px" }}>Accès limité à la Session Découverte</p>
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>Débloque les 30 sessions complètes pour 147€ — paiement unique, accès à vie.</p>
             </div>
             <Link href="/inscription" style={{ textDecoration: "none" }}>
-              <button
-                style={{
-                  background: "linear-gradient(90deg, #A78BFA, #F472B6)",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "10px",
-                  padding: "12px 22px",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-              >
+              <button style={{ background: "linear-gradient(90deg, #A78BFA, #F472B6)", color: "#fff", border: "none", borderRadius: "10px", padding: "12px 22px", fontSize: "14px", fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}>
                 Débloquer — 147€
               </button>
             </Link>
@@ -350,123 +282,41 @@ export default function DashboardPage() {
         )}
 
         {showAppareil && (
-          <div
-            style={{
-              background: "rgba(167,139,250,0.08)",
-              border: "1px solid rgba(167,139,250,0.2)",
-              borderRadius: "16px",
-              padding: "32px",
-              marginBottom: "32px",
-            }}
-          >
-            <h2 style={{ fontSize: "18px", fontWeight: 700, marginBottom: "8px" }}>
-              Sur quel appareil travailles-tu ?
-            </h2>
-            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginBottom: "20px" }}>
-              Tu pourras modifier ce choix à tout moment.
-            </p>
-            <AppareilSelector
-              appareils={appareils}
-              initial={appareil}
-              onValider={sauvegarderAppareil}
-            />
+          <div style={{ background: "rgba(167,139,250,0.08)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: "16px", padding: "32px", marginBottom: "32px" }}>
+            <h2 style={{ fontSize: "18px", fontWeight: 700, marginBottom: "8px" }}>Sur quel appareil travailles-tu ?</h2>
+            <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.5)", marginBottom: "20px" }}>Tu pourras modifier ce choix à tout moment.</p>
+            <AppareilSelector appareils={appareils} initial={appareil} onValider={sauvegarderAppareil} />
           </div>
         )}
 
         {formationTerminee && (
-          <div
-            style={{
-              background: "rgba(103,232,249,0.08)",
-              border: "1px solid rgba(103,232,249,0.25)",
-              borderRadius: "16px",
-              padding: "24px 28px",
-              marginBottom: "32px",
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "16px",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
+          <div style={{ background: "rgba(103,232,249,0.08)", border: "1px solid rgba(103,232,249,0.25)", borderRadius: "16px", padding: "24px 28px", marginBottom: "32px", display: "flex", flexWrap: "wrap", gap: "16px", justifyContent: "space-between", alignItems: "center" }}>
             <div>
-              <p style={{ fontWeight: 700, fontSize: "15px", marginBottom: "4px" }}>
-                🎉 Formation terminée — félicitations !
-              </p>
-              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>
-                Ton attestation de formation est prête à télécharger.
-              </p>
+              <p style={{ fontWeight: 700, fontSize: "15px", marginBottom: "4px" }}>🎉 Formation terminée — félicitations !</p>
+              <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)" }}>Ton attestation de formation est prête à télécharger.</p>
             </div>
             <button
               onClick={telechargerCertificat}
               disabled={genCertificat}
-              style={{
-                background: "linear-gradient(90deg, #67E8F9, #A78BFA)",
-                color: "#070014",
-                border: "none",
-                borderRadius: "10px",
-                padding: "12px 22px",
-                fontSize: "14px",
-                fontWeight: 700,
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
+              style={{ background: "linear-gradient(90deg, #67E8F9, #A78BFA)", color: "#070014", border: "none", borderRadius: "10px", padding: "12px 22px", fontSize: "14px", fontWeight: 700, cursor: "pointer", whiteSpace: "nowrap" }}
             >
               {genCertificat ? "Génération…" : "Télécharger mon attestation"}
             </button>
           </div>
         )}
 
-        <div
-          style={{
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: "16px",
-            padding: "28px",
-            marginBottom: "32px",
-          }}
-        >
+        <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "16px", padding: "28px", marginBottom: "32px" }}>
           <p style={{ fontSize: "16px", fontWeight: 600, marginBottom: "16px" }}>
             Tu as terminé{" "}
-            <span style={{ color: "#A78BFA" }}>
-              {sessionsTerminees} session{sessionsTerminees > 1 ? "s" : ""}
-            </span>{" "}
+            <span style={{ color: "#A78BFA" }}>{sessionsTerminees} session{sessionsTerminees > 1 ? "s" : ""}</span>{" "}
             sur 30
           </p>
-
-          <div
-            style={{
-              background: "rgba(255,255,255,0.06)",
-              borderRadius: "99px",
-              height: "8px",
-              marginBottom: "20px",
-            }}
-          >
-            <div
-              style={{
-                background: "linear-gradient(90deg, #A78BFA, #F472B6)",
-                borderRadius: "99px",
-                height: "8px",
-                width: `${(sessionsTerminees / 30) * 100}%`,
-                transition: "width 0.4s ease",
-              }}
-            />
+          <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: "99px", height: "8px", marginBottom: "20px" }}>
+            <div style={{ background: "linear-gradient(90deg, #A78BFA, #F472B6)", borderRadius: "99px", height: "8px", width: `${(sessionsTerminees / 30) * 100}%`, transition: "width 0.4s ease" }} />
           </div>
-
           {prochaineSession && !formationTerminee && (
             <Link href={`/session/${prochaineSession.id}`} style={{ textDecoration: "none" }}>
-              <button
-                style={{
-                  background: "linear-gradient(90deg, #A78BFA, #F472B6)",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "10px",
-                  padding: "14px 28px",
-                  fontSize: "15px",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  boxShadow: "0 0 24px rgba(167,139,250,0.3)",
-                }}
-              >
+              <button style={{ background: "linear-gradient(90deg, #A78BFA, #F472B6)", color: "#fff", border: "none", borderRadius: "10px", padding: "14px 28px", fontSize: "15px", fontWeight: 700, cursor: "pointer", boxShadow: "0 0 24px rgba(167,139,250,0.3)" }}>
                 Reprendre — {prochaineSession.titre}
               </button>
             </Link>
@@ -477,31 +327,11 @@ export default function DashboardPage() {
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
             <span style={{ fontSize: "13px", color: "rgba(255,255,255,0.4)" }}>Ton appareil :</span>
             {appareil.map((a) => (
-              <span
-                key={a}
-                style={{
-                  fontSize: "12px",
-                  background: "rgba(103,232,249,0.1)",
-                  border: "1px solid rgba(103,232,249,0.2)",
-                  color: "#67E8F9",
-                  borderRadius: "20px",
-                  padding: "4px 12px",
-                }}
-              >
+              <span key={a} style={{ fontSize: "12px", background: "rgba(103,232,249,0.1)", border: "1px solid rgba(103,232,249,0.2)", color: "#67E8F9", borderRadius: "20px", padding: "4px 12px" }}>
                 {appareils.find((ap) => ap.id === a)?.label}
               </span>
             ))}
-            <button
-              onClick={() => setShowAppareil(true)}
-              style={{
-                fontSize: "12px",
-                color: "rgba(255,255,255,0.3)",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                textDecoration: "underline",
-              }}
-            >
+            <button onClick={() => setShowAppareil(true)} style={{ fontSize: "12px", color: "rgba(255,255,255,0.3)", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
               Modifier
             </button>
           </div>
@@ -509,63 +339,28 @@ export default function DashboardPage() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
           {sessions.map((session, index) => {
-            const statut = progress[session.id] || "a_faire";
-            const isTerminee = statut === "terminee";
-            const isEnCours = statut === "en_cours";
+            const isTerminee = Boolean(progress[session.id]);
             const verrouillee = !session.gratuite && !hasPaid;
 
             return (
-              <Link
-                key={session.id}
-                href={verrouillee ? "/inscription" : `/session/${session.id}`}
-                style={{ textDecoration: "none" }}
-              >
-                <div
-                  style={{
-                    background: isTerminee ? "rgba(103,232,249,0.04)" : "rgba(255,255,255,0.03)",
-                    border: `1px solid ${
-                      isTerminee
-                        ? "rgba(103,232,249,0.15)"
-                        : isEnCours
-                        ? "rgba(167,139,250,0.2)"
-                        : "rgba(255,255,255,0.06)"
-                    }`,
-                    borderRadius: "12px",
-                    padding: "18px 20px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    cursor: "pointer",
-                    opacity: verrouillee ? 0.55 : 1,
-                  }}
-                >
+              <Link key={session.id} href={verrouillee ? "/inscription" : `/session/${session.id}`} style={{ textDecoration: "none" }}>
+                <div style={{
+                  background: isTerminee ? "rgba(103,232,249,0.04)" : "rgba(255,255,255,0.03)",
+                  border: `1px solid ${isTerminee ? "rgba(103,232,249,0.15)" : "rgba(255,255,255,0.06)"}`,
+                  borderRadius: "12px",
+                  padding: "18px 20px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  opacity: verrouillee ? 0.55 : 1,
+                }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                    <div
-                      style={{
-                        width: "32px",
-                        height: "32px",
-                        borderRadius: "50%",
-                        background: isTerminee ? "rgba(103,232,249,0.15)" : "rgba(255,255,255,0.05)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "13px",
-                        color: isTerminee ? "#67E8F9" : "rgba(255,255,255,0.3)",
-                        fontWeight: 700,
-                        flexShrink: 0,
-                      }}
-                    >
+                    <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: isTerminee ? "rgba(103,232,249,0.15)" : "rgba(255,255,255,0.05)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", color: isTerminee ? "#67E8F9" : "rgba(255,255,255,0.3)", fontWeight: 700, flexShrink: 0 }}>
                       {isTerminee ? "✓" : verrouillee ? "🔒" : index}
                     </div>
-
                     <div>
-                      <p
-                        style={{
-                          fontSize: "15px",
-                          fontWeight: 600,
-                          color: isTerminee ? "rgba(255,255,255,0.6)" : "#ffffff",
-                        }}
-                      >
+                      <p style={{ fontSize: "15px", fontWeight: 600, color: isTerminee ? "rgba(255,255,255,0.6)" : "#ffffff" }}>
                         {session.titre}
                       </p>
                       {(session as any).gratuite && (
@@ -573,27 +368,16 @@ export default function DashboardPage() {
                       )}
                     </div>
                   </div>
-
-                  <span
-                    style={{
-                      fontSize: "12px",
-                      color: isTerminee ? "#67E8F9" : isEnCours ? "#A78BFA" : "rgba(255,255,255,0.25)",
-                      background: isTerminee
-                        ? "rgba(103,232,249,0.08)"
-                        : isEnCours
-                        ? "rgba(167,139,250,0.08)"
-                        : "transparent",
-                      border: isTerminee
-                        ? "1px solid rgba(103,232,249,0.15)"
-                        : isEnCours
-                        ? "1px solid rgba(167,139,250,0.15)"
-                        : "none",
-                      borderRadius: "20px",
-                      padding: isTerminee || isEnCours ? "3px 10px" : "0",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {verrouillee ? "147€" : isTerminee ? "Terminée" : isEnCours ? "En cours" : "Commencer"}
+                  <span style={{
+                    fontSize: "12px",
+                    color: isTerminee ? "#67E8F9" : "rgba(255,255,255,0.25)",
+                    background: isTerminee ? "rgba(103,232,249,0.08)" : "transparent",
+                    border: isTerminee ? "1px solid rgba(103,232,249,0.15)" : "none",
+                    borderRadius: "20px",
+                    padding: isTerminee ? "3px 10px" : "0",
+                    whiteSpace: "nowrap",
+                  }}>
+                    {verrouillee ? "147€" : isTerminee ? "Terminée" : "Commencer"}
                   </span>
                 </div>
               </Link>

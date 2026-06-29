@@ -487,7 +487,7 @@ export default function ProgrammePage() {
             lineHeight: 1.3,
           }}
         >
-          Prête à commencer ?
+          Prêt à commencer ?
         </h2>
         <p
           style={{
