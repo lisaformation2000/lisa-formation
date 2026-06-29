@@ -305,9 +305,12 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
 
       if (user) {
         const { data: progress } = await supabase
-          .from('user_progress').select('*')
-          .eq('user_id', user.id).eq('session_id', data.session_id).maybeSingle()
-        if (progress) setCompleted(true)
+          .from('session_progress')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('session_id', data.session_id)
+          .maybeSingle()
+        if (progress?.completed) setCompleted(true)
       }
 
       setLoading(false)
@@ -318,16 +321,20 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   const markComplete = async () => {
     if (!userId || !session || completed) return
     setMarking(true)
-    await supabase.from('user_progress').upsert({
-      user_id: userId, session_id: session.session_id,
-      statut: 'terminee', completed_at: new Date().toISOString()
+    await supabase.from('session_progress').upsert({
+      user_id: userId,
+      session_id: session.session_id,
+      completed: true,
+      completed_at: new Date().toISOString()
     }, { onConflict: 'user_id,session_id' })
-    setCompleted(true); setMarking(false)
+    setCompleted(true)
+    setMarking(false)
   }
 
   const copier = (texte: string, key: string) => {
     navigator.clipboard.writeText(texte)
-    setCopied(key); setTimeout(() => setCopied(null), 1500)
+    setCopied(key)
+    setTimeout(() => setCopied(null), 1500)
   }
 
   const currentId = parseInt(id)
@@ -376,25 +383,30 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         {infos && <p style={{ color: '#67E8F9', fontSize: '0.88rem', marginBottom: '28px' }}>{infos}</p>}
         {!infos && duree && <p style={{ color: '#67E8F9', fontSize: '0.9rem', marginBottom: '28px' }}>⏱ {duree}</p>}
 
+        {/* Sommaire — corrigé mobile */}
         {sommaire.length > 0 && (
           <div style={{ backgroundColor: 'rgba(167,139,250,0.05)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '12px', padding: '20px 24px', marginBottom: '40px' }}>
             {sommaire.map((item, i) => (
-              <p key={i} style={{ color: '#e2e8f0', fontSize: '0.92rem', margin: '8px 0', display: 'flex', gap: '12px' }}>
-                <span style={{ color: '#F472B6', fontWeight: 700 }}>{i + 1}.</span> {item}
-              </p>
+              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', margin: '8px 0' }}>
+                <span style={{ color: '#F472B6', fontWeight: 700, flexShrink: 0, minWidth: '20px' }}>{i + 1}.</span>
+                <span style={{ color: '#e2e8f0', fontSize: '0.92rem', lineHeight: 1.5 }}>{item}</span>
+              </div>
             ))}
           </div>
         )}
 
         {parties.map((part: any, index: number) => {
-          const pTitre = part.titre || part.title
+          const pTitre = part.titre || part.title || ''
           const pNumero = part.numero ?? index + 1
+
+          // Correction doubles numéros : si le titre commence déjà par "N." on le retire
+          const titreSansDouble = pTitre.replace(/^\d+\.\s*/, '')
 
           return (
             <div key={index} style={{ marginBottom: '48px' }}>
               <h2 style={{ display: 'flex', alignItems: 'baseline', gap: '12px', fontSize: '1.35rem', fontWeight: 700, marginBottom: '18px' }}>
                 <span style={{ color: '#F472B6', fontWeight: 800 }}>{pNumero}.</span>
-                <span style={{ color: '#ffffff' }}>{pTitre}</span>
+                <span style={{ color: '#ffffff' }}>{titreSansDouble}</span>
                 {part.duree && <span style={{ color: '#67E8F9', fontSize: '0.8rem', fontWeight: 400 }}>· {part.duree}</span>}
               </h2>
 
