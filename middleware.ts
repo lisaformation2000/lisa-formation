@@ -6,6 +6,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  runtime: 'nodejs',
   matcher: [
     /*
      * On exécute le middleware sur tout sauf les fichiers statiques/images,

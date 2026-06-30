@@ -216,13 +216,23 @@ function normaliserLigne(item: any): { cle: string; valeur: string } {
   return { cle: String(item ?? ''), valeur: '' }
 }
 
-function VueTableau({ lignes }: { lignes: any[] }) {
+function VueTableau({ lignes, titre }: { lignes: any[]; titre?: string }) {
   return (
-    <div style={{ marginBottom: '18px' }}>
+    <div style={{ backgroundColor: 'rgba(167,139,250,0.05)', border: '1px solid rgba(167,139,250,0.2)', borderRadius: '12px', padding: '20px 24px', marginBottom: '24px' }}>
+      {titre && <p style={{ color: '#A78BFA', fontWeight: 700, fontSize: '0.85rem', marginBottom: '14px' }}>{titre}</p>}
       {lignes.map((ligne: any, i: number) => (
-        <div key={i} style={{ display: 'flex', gap: '16px', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <span style={{ color: '#67E8F9', fontWeight: 700, fontSize: '0.9rem', minWidth: '180px' }}>{ligne.cle}</span>
-          <span style={{ color: '#e2e8f0', fontSize: '0.9rem' }}>{ligne.valeur}</span>
+        <div
+          key={i}
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '4px 16px',
+            padding: '10px 0',
+            borderBottom: i < lignes.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+          }}
+        >
+          <span style={{ color: '#F472B6', fontWeight: 700, fontSize: '0.9rem', flex: '0 0 auto' }}>{ligne.cle}</span>
+          <span style={{ color: '#e2e8f0', fontSize: '0.92rem', flex: '1 1 200px' }}>{ligne.valeur}</span>
         </div>
       ))}
     </div>
@@ -256,7 +266,7 @@ function VueBloc({ bloc, partIndex, blocIndex, copied, onCopy, filtreAppareil }:
     case 'checklist':
       return <VueChecklist items={bloc.items || []} />
     case 'tableau':
-      return <VueTableau lignes={bloc.lignes || []} />
+      return <VueTableau lignes={bloc.lignes || []} titre={bloc.titre} />
     default:
       return null
   }
