@@ -70,7 +70,6 @@ export default function ComptePage() {
         .eq('user_id', user.id)
         .eq('completed', true)
 
-      // FIX : on ne garde que les sessions 1 à 30 (exclut la session 0 Découverte)
       const ids = (prog || [])
         .map((p: any) => p.session_id)
         .filter((id: number) => id >= 1 && id <= 30)
@@ -98,7 +97,7 @@ export default function ComptePage() {
   async function downloadCertificat() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    window.open(`/api/certificat?userId=${user.id}`, '_blank')
+    window.open(`/api/certificate?userId=${user.id}`, '_blank')
   }
 
   return (
