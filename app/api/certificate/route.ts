@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { generateCertificat } from '@/lib/generateCertificat'
 
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  'https://cejaflvoowyytkuqvwdz.supabase.co'
+
+const SUPABASE_SERVICE_ROLE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const userId = searchParams.get('userId')
@@ -10,10 +17,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'userId requis' }, { status: 400 })
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  if (!SUPABASE_SERVICE_ROLE_KEY) {
+    return NextResponse.json({ error: 'Configuration serveur manquante' }, { status: 500 })
+  }
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -54,7 +62,7 @@ export async function GET(req: NextRequest) {
   const nom = profile.last_name || ''
 
   const buffer = Buffer.from(pdfBytes)
-return new NextResponse(buffer, {
+  return new NextResponse(buffer, {
     headers: {
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="certificat-lisa-${prenom}-${nom}.pdf"`

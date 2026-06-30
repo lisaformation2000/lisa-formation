@@ -13,10 +13,7 @@ const SUPABASE_ANON_KEY =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlamFmbHZvb3d5eXRrdXF2d2R6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MjkyNDcsImV4cCI6MjA5NTUwNTI0N30.T2M46dGoj39SpYnJqcl_uGc7xlJYPK72jos8Beb9blU'
 
-const supabase = createBrowserClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-)
+const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 const BADGES = [
   { label: 'Semaine 1', sessions: Array.from({length: 7}, (_, i) => i + 1), color: '#F472B6' },
@@ -24,6 +21,29 @@ const BADGES = [
   { label: 'Semaine 3', sessions: Array.from({length: 7}, (_, i) => i + 15), color: '#67E8F9' },
   { label: 'Semaine 4', sessions: Array.from({length: 9}, (_, i) => i + 22), color: '#FCD34D' },
 ]
+
+const APPAREIL_LABELS: Record<string, string> = {
+  windows: '💻 Windows',
+  apple: '🍎 Mac / Apple',
+  iphone: '📱 iPhone',
+  android: '🤖 Android',
+}
+
+function getAppareilLabel(raw: any): string {
+  if (!raw) return 'Appareil non défini'
+  try {
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return APPAREIL_LABELS[parsed[0]] || parsed[0]
+    }
+    if (typeof parsed === 'string') {
+      return APPAREIL_LABELS[parsed] || parsed
+    }
+  } catch {
+    if (typeof raw === 'string') return APPAREIL_LABELS[raw] || raw
+  }
+  return 'Appareil non défini'
+}
 
 export default function ComptePage() {
   const router = useRouter()
@@ -50,7 +70,12 @@ export default function ComptePage() {
         .eq('user_id', user.id)
         .eq('completed', true)
 
-      setCompletedIds((prog || []).map((p: any) => p.session_id))
+      // FIX : on ne garde que les sessions 1 à 30 (exclut la session 0 Découverte)
+      const ids = (prog || [])
+        .map((p: any) => p.session_id)
+        .filter((id: number) => id >= 1 && id <= 30)
+
+      setCompletedIds(ids)
       setLoading(false)
     }
     load()
@@ -63,7 +88,7 @@ export default function ComptePage() {
   )
 
   const totalSessions = 30
-  const progressPct = Math.round((completedIds.length / totalSessions) * 100)
+  const progressPct = Math.min(Math.round((completedIds.length / totalSessions) * 100), 100)
   const hasS30 = completedIds.includes(30)
 
   function badgeUnlocked(badge: typeof BADGES[0]) {
@@ -99,7 +124,7 @@ export default function ComptePage() {
                 {profile?.first_name} {profile?.last_name}
               </div>
               <div className="text-white/40 text-sm">
-                {profile?.appareil_prefere || 'Appareil non défini'}
+                {getAppareilLabel(profile?.appareil_prefere)}
               </div>
             </div>
             <div className="ml-auto">
@@ -178,7 +203,7 @@ export default function ComptePage() {
               </>
             ) : (
               <p className="text-white/30 text-xs">
-                Disponible à la fin de la session 30 — encore {30 - completedIds.filter(id => id >= 1 && id <= 30).length} session{30 - completedIds.filter(id => id >= 1 && id <= 30).length > 1 ? 's' : ''} à terminer.
+                Disponible à la fin de la session 30 — encore {30 - completedIds.length} session{30 - completedIds.length > 1 ? 's' : ''} à terminer.
               </p>
             )}
           </div>
