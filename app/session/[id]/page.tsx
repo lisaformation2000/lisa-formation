@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { use } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -116,14 +116,17 @@ function logoPourCle(key: string): React.ReactNode {
 }
 
 function VueAppareils({ items, filtre }: { items: any[]; filtre: string[] }) {
-  const normFiltre = filtre.map((f) => (f === 'apple' ? 'mac' : f))
-  const visibles = normFiltre.length > 0
-    ? items.filter((app: any) => {
-        const k = (app.logo || '').toLowerCase()
-        return normFiltre.includes(k === 'apple' ? 'mac' : k)
-      })
-    : items
-  const aAfficher = visibles.length > 0 ? visibles : items
+  const aAfficher = useMemo(() => {
+    const normFiltre = filtre.map((f) => (f === 'apple' ? 'mac' : f))
+    const visibles = normFiltre.length > 0
+      ? items.filter((app: any) => {
+          const k = (app.logo || '').toLowerCase()
+          return normFiltre.includes(k === 'apple' ? 'mac' : k)
+        })
+      : items
+    return visibles.length > 0 ? visibles : items
+  }, [items, filtre])
+
   return (
     <>
       {aAfficher.map((app: any, i: number) => {
@@ -351,22 +354,24 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   const prevId = !isNaN(currentId) && currentId > 0 ? currentId - 1 : null
   const nextId = !isNaN(currentId) && currentId < 30 ? currentId + 1 : null
 
+  const c = session?.content_json as any
+
+  const titre = c?.titre || c?.title || 'Session'
+  const sousTitre = c?.sous_titre
+  const tagline = c?.tagline
+  const duree = c?.duree || c?.duration
+  const infos = c?.infos
+  const sessionSuivante = c?.session_suivante
+
+  const sommaire: string[] = useMemo(() => c?.sommaire || [], [c])
+  const parties: any[] = useMemo(() => c?.parties || c?.parts || [], [c])
+
   if (loading) return (
     <div style={{ backgroundColor: '#070014', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <p style={{ color: '#A78BFA', fontSize: '1.1rem' }}>Chargement de la session...</p>
     </div>
   )
   if (!session) return null
-
-  const c = session.content_json as any
-  const titre = c.titre || c.title || 'Session'
-  const sousTitre = c.sous_titre
-  const tagline = c.tagline
-  const duree = c.duree || c.duration
-  const infos = c.infos
-  const sommaire: string[] = c.sommaire || []
-  const parties: any[] = c.parties || c.parts || []
-  const sessionSuivante = c.session_suivante
 
   return (
     <div style={{ backgroundColor: '#070014', minHeight: '100vh', fontFamily: 'sans-serif' }}>
