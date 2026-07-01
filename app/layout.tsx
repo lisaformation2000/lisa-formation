@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Dancing_Script } from "next/font/google";
 import "./globals.css";
 import CookieBanner from "@/components/CookieBanner";
 
@@ -11,6 +11,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const dancingScript = Dancing_Script({
+  variable: "--font-lisa-cursive",
+  subsets: ["latin"],
+  weight: ["500", "700"],
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://formationlisa.fr";
@@ -79,7 +85,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${dancingScript.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {children}

@@ -48,7 +48,7 @@ function getAppareilLabel(raw: any): string {
 
 // Style néon lumineux façon logo LISA
 const neonText: React.CSSProperties = {
-  fontFamily: "'Brush Script MT', 'Segoe Script', 'Snell Roundhand', cursive",
+  fontFamily: "var(--font-lisa-cursive), 'Brush Script MT', cursive",
   background: 'linear-gradient(100deg, #FCA5C4 0%, #F472B6 20%, #C4A6F5 42%, #67E8F9 62%, #A78BFA 82%, #F9A8D4 100%)',
   WebkitBackgroundClip: 'text',
   WebkitTextFillColor: 'transparent',
@@ -149,7 +149,7 @@ export default function ComptePage() {
                   background: 'rgba(7,0,20,0.55)',
                   border: '1.5px solid rgba(255,255,255,0.18)',
                 }}>
-                <span style={{ ...neonText, fontSize: '38px', fontWeight: 700, lineHeight: 1 }}>
+                <span style={{ ...neonText, fontSize: '42px', fontWeight: 700, lineHeight: 1 }}>
                   {initiale}
                 </span>
               </div>
@@ -217,14 +217,14 @@ export default function ComptePage() {
                     boxShadow: unlocked ? '0 0 16px rgba(167,139,250,0.25)' : 'none',
                   }}>
                   <span style={{
-                    fontSize: '40px',
+                    fontSize: '52px',
                     fontWeight: 700,
-                    lineHeight: 1,
+                    lineHeight: 1.1,
                     ...(unlocked
                       ? neonText
                       : {
-                          fontFamily: "'Brush Script MT', 'Segoe Script', cursive",
-                          color: 'rgba(255,255,255,0.13)',
+                          fontFamily: "var(--font-lisa-cursive), cursive",
+                          color: 'rgba(255,255,255,0.15)',
                         }),
                   }}>
                     {badge.lettre}
