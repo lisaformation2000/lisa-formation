@@ -21,6 +21,9 @@ export default function InscriptionPage() {
   const [accepteCGV, setAccepteCGV] = useState(false)
   const [renonceRetractation, setRenonceRetractation] = useState(false)
 
+  const [afficherMotDePasse, setAfficherMotDePasse] = useState(false)
+  const [afficherConfirmation, setAfficherConfirmation] = useState(false)
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -253,8 +256,44 @@ export default function InscriptionPage() {
             <input type="text" placeholder="Prénom" value={prenom} onChange={(e) => setPrenom(e.target.value)} style={inputStyle} autoComplete="given-name" />
             <input type="text" placeholder="Nom" value={nom} onChange={(e) => setNom(e.target.value)} style={inputStyle} autoComplete="family-name" />
             <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} autoComplete="email" />
-            <input type="password" placeholder="Mot de passe (8 caractères minimum)" value={motDePasse} onChange={(e) => setMotDePasse(e.target.value)} style={inputStyle} autoComplete="new-password" />
-            <input type="password" placeholder="Confirme ton mot de passe" value={confirmationMotDePasse} onChange={(e) => setConfirmationMotDePasse(e.target.value)} style={inputStyle} autoComplete="new-password" />
+
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                type={afficherMotDePasse ? 'text' : 'password'}
+                placeholder="Mot de passe (8 caractères minimum)"
+                value={motDePasse}
+                onChange={(e) => setMotDePasse(e.target.value)}
+                style={{ ...inputStyle, paddingRight: '48px' }}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setAfficherMotDePasse((v) => !v)}
+                aria-label={afficherMotDePasse ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                style={boutonOeilStyle}
+              >
+                {afficherMotDePasse ? '🙈' : '👁️'}
+              </button>
+            </div>
+
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                type={afficherConfirmation ? 'text' : 'password'}
+                placeholder="Confirme ton mot de passe"
+                value={confirmationMotDePasse}
+                onChange={(e) => setConfirmationMotDePasse(e.target.value)}
+                style={{ ...inputStyle, paddingRight: '48px' }}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setAfficherConfirmation((v) => !v)}
+                aria-label={afficherConfirmation ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                style={boutonOeilStyle}
+              >
+                {afficherConfirmation ? '🙈' : '👁️'}
+              </button>
+            </div>
 
             <CasesLegales
               accepteCGV={accepteCGV}
@@ -350,6 +389,22 @@ const inputStyle: React.CSSProperties = {
   outline: 'none',
   width: '100%',
   boxSizing: 'border-box',
+}
+
+const boutonOeilStyle: React.CSSProperties = {
+  position: 'absolute',
+  right: '4px',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  background: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+  fontSize: '18px',
+  padding: '8px',
+  lineHeight: 1,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 }
 
 const boutonPrincipalStyle: React.CSSProperties = {

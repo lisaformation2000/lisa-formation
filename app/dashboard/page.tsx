@@ -180,7 +180,8 @@ export default function DashboardPage() {
         if (!progressError && prog) {
           const map: Record<number, boolean> = {};
           prog.forEach((p: any) => {
-            if (p.session_id !== undefined) {
+            // FIX : on exclut la session 0 (Découverte) du comptage des 30 sessions
+            if (p.session_id !== undefined && p.session_id >= 1 && p.session_id <= 30) {
               map[p.session_id] = Boolean(p.completed);
             }
           });
@@ -220,7 +221,8 @@ export default function DashboardPage() {
     if (!user) return;
     setGenCertificat(true);
     try {
-      window.open(`/api/certificat?userId=${user.id}`, '_blank');
+      // FIX : route corrigée de /api/certificat vers /api/certificate
+      window.open(`/api/certificate?userId=${user.id}`, '_blank');
     } finally {
       setGenCertificat(false);
     }
