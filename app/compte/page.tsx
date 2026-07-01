@@ -46,10 +46,19 @@ function getAppareilLabel(raw: any): string {
   return 'Appareil non défini'
 }
 
+// Style néon lumineux façon logo LISA
+const neonText: React.CSSProperties = {
+  fontFamily: "'Brush Script MT', 'Segoe Script', 'Snell Roundhand', cursive",
+  background: 'linear-gradient(100deg, #FCA5C4 0%, #F472B6 20%, #C4A6F5 42%, #67E8F9 62%, #A78BFA 82%, #F9A8D4 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  filter: 'drop-shadow(0 0 6px rgba(167,139,250,0.55)) drop-shadow(0 0 12px rgba(103,232,249,0.35))',
+}
+
 export default function ComptePage() {
   const router = useRouter()
   const [profile, setProfile] = useState<any>(null)
-  const [email, setEmail] = useState<string>('')
   const [completedIds, setCompletedIds] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -57,8 +66,6 @@ export default function ComptePage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
-
-      setEmail(user.email || '')
 
       const { data: prof } = await supabase
         .from('profiles')
@@ -94,7 +101,6 @@ export default function ComptePage() {
   const progressPct = Math.min(Math.round((completedIds.length / totalSessions) * 100), 100)
   const hasS30 = completedIds.includes(30)
 
-  // Nom affiché : prénom si dispo, sinon on n'affiche pas le début du mail
   const prenomAffiche = profile?.first_name?.trim() || ''
   const nomComplet = `${prenomAffiche} ${profile?.last_name || ''}`.trim()
   const initiale = (prenomAffiche?.[0] || nomComplet?.[0] || '✦').toUpperCase()
@@ -121,34 +127,29 @@ export default function ComptePage() {
         </div>
 
         {/* Profil */}
-        <div className="rounded-2xl p-6 border border-white/10"
-          style={{ background: 'linear-gradient(135deg, rgba(244,114,182,0.08), rgba(167,139,250,0.06), rgba(103,232,249,0.05))' }}>
+        <div className="rounded-2xl p-6 border"
+          style={{
+            borderColor: 'rgba(167,139,250,0.25)',
+            background: 'linear-gradient(135deg, rgba(244,114,182,0.14), rgba(167,139,250,0.10), rgba(103,232,249,0.08))',
+          }}>
           <div className="flex items-center gap-4">
-            {/* Initiale stylée façon logo LISA */}
+            {/* Initiale néon façon logo */}
             <div className="relative flex items-center justify-center flex-shrink-0"
-              style={{ width: '64px', height: '64px' }}>
+              style={{ width: '68px', height: '68px' }}>
               <div className="absolute inset-0 rounded-full"
                 style={{
                   background: 'linear-gradient(135deg, #F472B6, #A78BFA, #67E8F9)',
-                  opacity: 0.25,
-                  filter: 'blur(8px)',
+                  opacity: 0.35,
+                  filter: 'blur(10px)',
                 }} />
               <div className="relative flex items-center justify-center rounded-full"
                 style={{
-                  width: '64px',
-                  height: '64px',
-                  background: 'rgba(7,0,20,0.6)',
-                  border: '1.5px solid rgba(255,255,255,0.15)',
+                  width: '68px',
+                  height: '68px',
+                  background: 'rgba(7,0,20,0.55)',
+                  border: '1.5px solid rgba(255,255,255,0.18)',
                 }}>
-                <span style={{
-                  fontSize: '30px',
-                  fontWeight: 800,
-                  fontFamily: "'Brush Script MT', 'Segoe Script', cursive",
-                  background: 'linear-gradient(135deg, #F472B6, #A78BFA, #67E8F9)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}>
+                <span style={{ ...neonText, fontSize: '38px', fontWeight: 700, lineHeight: 1 }}>
                   {initiale}
                 </span>
               </div>
@@ -158,7 +159,7 @@ export default function ComptePage() {
               <div className="text-white font-semibold text-lg truncate">
                 {nomComplet || 'Bienvenue'}
               </div>
-              <div className="text-white/40 text-sm truncate">
+              <div className="text-white/45 text-sm truncate">
                 {getAppareilLabel(profile?.appareil_prefere)}
               </div>
             </div>
@@ -175,7 +176,7 @@ export default function ComptePage() {
         </div>
 
         {/* Progression */}
-        <div className="rounded-2xl p-6 border border-white/10" style={{ background: 'rgba(255,255,255,0.04)' }}>
+        <div className="rounded-2xl p-6 border" style={{ borderColor: 'rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.04)' }}>
           <div className="flex justify-between items-center mb-3">
             <span className="text-white/70 text-sm font-medium">Progression globale</span>
             <span className="text-white font-bold">{progressPct}%</span>
@@ -185,18 +186,22 @@ export default function ComptePage() {
               style={{
                 width: `${progressPct}%`,
                 background: 'linear-gradient(90deg, #F472B6, #A78BFA, #67E8F9)',
-                boxShadow: '0 0 12px rgba(167,139,250,0.5)',
+                boxShadow: '0 0 14px rgba(167,139,250,0.6)',
               }} />
           </div>
-          <div className="mt-3 text-white/40 text-xs">
+          <div className="mt-3 text-white/45 text-xs">
             {completedIds.length} session{completedIds.length > 1 ? 's' : ''} terminée{completedIds.length > 1 ? 's' : ''} sur {totalSessions}
           </div>
         </div>
 
-        {/* Badges L-I-S-A */}
-        <div className="rounded-2xl p-6 border border-white/10" style={{ background: 'rgba(255,255,255,0.04)' }}>
-          <div className="text-white/70 text-sm font-medium mb-1">Tes badges LISA</div>
-          <div className="text-white/35 text-xs mb-4">Débloque les 4 semaines pour reformer le logo complet.</div>
+        {/* Badges L-I-S-A néon */}
+        <div className="rounded-2xl p-6 border"
+          style={{
+            borderColor: 'rgba(167,139,250,0.20)',
+            background: 'linear-gradient(160deg, rgba(167,139,250,0.08), rgba(103,232,249,0.05))',
+          }}>
+          <div className="text-white/75 text-sm font-medium mb-1">Tes badges LISA</div>
+          <div className="text-white/40 text-xs mb-5">Débloque les 4 semaines pour reformer le logo complet.</div>
           <div className="grid grid-cols-4 gap-3">
             {BADGES.map(badge => {
               const unlocked = badgeUnlocked(badge)
@@ -205,31 +210,29 @@ export default function ComptePage() {
                 <div key={badge.label}
                   className="rounded-xl p-3 border transition-all flex flex-col items-center"
                   style={{
-                    borderColor: unlocked ? 'rgba(167,139,250,0.5)' : 'rgba(255,255,255,0.08)',
+                    borderColor: unlocked ? 'rgba(167,139,250,0.55)' : 'rgba(255,255,255,0.08)',
                     background: unlocked
-                      ? 'linear-gradient(135deg, rgba(244,114,182,0.12), rgba(103,232,249,0.10))'
+                      ? 'linear-gradient(145deg, rgba(244,114,182,0.16), rgba(103,232,249,0.12))'
                       : 'rgba(255,255,255,0.02)',
+                    boxShadow: unlocked ? '0 0 16px rgba(167,139,250,0.25)' : 'none',
                   }}>
                   <span style={{
-                    fontSize: '34px',
-                    fontWeight: 800,
+                    fontSize: '40px',
+                    fontWeight: 700,
                     lineHeight: 1,
-                    fontFamily: "'Brush Script MT', 'Segoe Script', cursive",
                     ...(unlocked
-                      ? {
-                          background: 'linear-gradient(135deg, #F472B6, #A78BFA, #67E8F9)',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                          backgroundClip: 'text',
-                        }
-                      : { color: 'rgba(255,255,255,0.15)' }),
+                      ? neonText
+                      : {
+                          fontFamily: "'Brush Script MT', 'Segoe Script', cursive",
+                          color: 'rgba(255,255,255,0.13)',
+                        }),
                   }}>
                     {badge.lettre}
                   </span>
-                  <div className="text-white/50 text-[10px] mt-2 text-center leading-tight">
+                  <div className="text-white/55 text-[10px] mt-2 text-center leading-tight">
                     {badge.label}
                   </div>
-                  <div className="text-white/30 text-[10px] mt-0.5">
+                  <div className="text-white/35 text-[10px] mt-0.5">
                     {done}/{badge.sessions.length}
                   </div>
                 </div>

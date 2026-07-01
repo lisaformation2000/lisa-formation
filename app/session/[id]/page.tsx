@@ -244,7 +244,7 @@ function VueChecklist({ items, storageKey }: { items: string[]; storageKey: stri
           <span style={{
             color: checked[i] ? 'rgba(255,255,255,0.5)' : '#e2e8f0',
             fontSize: '0.9rem',
-            textDecoration: checked[i] ? 'line-through' : 'none',
+            
           }}>
             {item}
           </span>
