@@ -190,15 +190,81 @@ function VuePrompts({ items, keyPrefix, copied, onCopy }: { items: any[]; keyPre
   )
 }
 
-function VueChecklist({ items }: { items: string[] }) {
+function VueChecklist({ items, storageKey }: { items: string[]; storageKey: string }) {
+  const [checked, setChecked] = useState<boolean[]>(() => items.map(() => false))
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(storageKey)
+      if (saved) {
+        const arr = JSON.parse(saved)
+        if (Array.isArray(arr) && arr.length === items.length) {
+          setChecked(arr)
+          return
+        }
+      }
+    } catch {}
+    setChecked(items.map(() => false))
+  }, [storageKey, items.length])
+
+  const toggle = (i: number) => {
+    setChecked((prev) => {
+      const next = [...prev]
+      next[i] = !next[i]
+      try { localStorage.setItem(storageKey, JSON.stringify(next)) } catch {}
+      return next
+    })
+  }
+
+  const tousCoches = checked.length > 0 && checked.every(Boolean)
+
   return (
     <div style={{ marginTop: '18px' }}>
       {items.map((item: string, i: number) => (
-        <div key={i} style={{ borderLeft: '3px solid #A78BFA', backgroundColor: 'rgba(167,139,250,0.05)', borderRadius: '6px', padding: '12px 16px', margin: '8px 0', display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <span style={{ color: '#A78BFA', fontSize: '1rem' }}>☐</span>
-          <span style={{ color: '#e2e8f0', fontSize: '0.9rem' }}>{item}</span>
+        <div
+          key={i}
+          onClick={() => toggle(i)}
+          style={{
+            borderLeft: `3px solid ${checked[i] ? '#3DDC84' : '#A78BFA'}`,
+            backgroundColor: checked[i] ? 'rgba(61,220,132,0.08)' : 'rgba(167,139,250,0.05)',
+            borderRadius: '6px',
+            padding: '12px 16px',
+            margin: '8px 0',
+            display: 'flex',
+            gap: '12px',
+            alignItems: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            userSelect: 'none',
+          }}
+        >
+          <span style={{ color: checked[i] ? '#3DDC84' : '#A78BFA', fontSize: '1.1rem', flexShrink: 0 }}>
+            {checked[i] ? '☑' : '☐'}
+          </span>
+          <span style={{
+            color: checked[i] ? 'rgba(255,255,255,0.5)' : '#e2e8f0',
+            fontSize: '0.9rem',
+            textDecoration: checked[i] ? 'line-through' : 'none',
+          }}>
+            {item}
+          </span>
         </div>
       ))}
+
+      {tousCoches && (
+        <div style={{
+          marginTop: '14px',
+          padding: '14px 18px',
+          borderRadius: '10px',
+          background: 'linear-gradient(135deg, rgba(61,220,132,0.12), rgba(103,232,249,0.10))',
+          border: '1px solid rgba(61,220,132,0.35)',
+          textAlign: 'center',
+        }}>
+          <p style={{ color: '#3DDC84', fontWeight: 700, fontSize: '0.95rem', margin: 0 }}>
+            🎉 Bravo, tu as tout coché ! Tu peux passer à la suite.
+          </p>
+        </div>
+      )}
     </div>
   )
 }
@@ -242,7 +308,7 @@ function VueTableau({ lignes, titre }: { lignes: any[]; titre?: string }) {
   )
 }
 
-function VueBloc({ bloc, partIndex, blocIndex, copied, onCopy, filtreAppareil }: { bloc: any; partIndex: number; blocIndex: number; copied: string | null; onCopy: (t: string, k: string) => void; filtreAppareil: string[] }) {
+function VueBloc({ bloc, partIndex, blocIndex, copied, onCopy, filtreAppareil, sessionId }: { bloc: any; partIndex: number; blocIndex: number; copied: string | null; onCopy: (t: string, k: string) => void; filtreAppareil: string[]; sessionId: number }) {
   switch (bloc.type) {
     case 'texte':
       return <p style={{ color: '#e2e8f0', lineHeight: 1.8, marginBottom: '18px', whiteSpace: 'pre-wrap' }}>{bloc.texte}</p>
@@ -267,7 +333,7 @@ function VueBloc({ bloc, partIndex, blocIndex, copied, onCopy, filtreAppareil }:
     case 'prompts':
       return <VuePrompts items={bloc.items || []} keyPrefix={`${partIndex}-${blocIndex}`} copied={copied} onCopy={onCopy} />
     case 'checklist':
-      return <VueChecklist items={bloc.items || []} />
+      return <VueChecklist items={bloc.items || []} storageKey={`lisa-checklist-s${sessionId}-p${partIndex}-b${blocIndex}`} />
     case 'tableau':
       return <VueTableau lignes={bloc.lignes || []} titre={bloc.titre} />
     default:
@@ -383,6 +449,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       <nav style={{ backgroundColor: '#000000', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button onClick={() => router.push('/dashboard')} style={{ color: '#A78BFA', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.95rem' }}>← Retour au dashboard</button>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <button onClick={() => router.push('/compte')} style={{ color: '#F472B6', background: 'none', border: '1px solid #F472B6', borderRadius: '8px', padding: '6px 14px', cursor: 'pointer', fontSize: '0.85rem' }}>👤 Mon compte</button>
           <button onClick={() => router.push('/programme')} style={{ color: '#67E8F9', background: 'none', border: '1px solid #67E8F9', borderRadius: '8px', padding: '6px 14px', cursor: 'pointer', fontSize: '0.85rem' }}>📋 Programme</button>
           <span style={{ color: '#67E8F9', fontSize: '0.85rem' }}>Session {currentId === 0 ? 'Découverte' : currentId} / 30</span>
         </div>
@@ -414,7 +481,6 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
           const pTitre = part.titre || part.title || ''
           const pNumero = part.numero ?? index + 1
 
-          // Correction doubles numéros : si le titre commence déjà par "N." on le retire
           const titreSansDouble = pTitre.replace(/^\d+\.\s*/, '')
 
           return (
@@ -426,7 +492,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
               </h2>
 
               {Array.isArray(part.blocs) && part.blocs.map((bloc: any, bi: number) => (
-                <VueBloc key={bi} bloc={bloc} partIndex={index} blocIndex={bi} copied={copied} onCopy={copier} filtreAppareil={filtreAppareil} />
+                <VueBloc key={bi} bloc={bloc} partIndex={index} blocIndex={bi} copied={copied} onCopy={copier} filtreAppareil={filtreAppareil} sessionId={session.session_id} />
               ))}
 
               {!Array.isArray(part.blocs) && (
@@ -454,7 +520,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
                   {(part.prompts || []).length > 0 && (
                     <VuePrompts items={part.prompts} keyPrefix={`${index}-legacy`} copied={copied} onCopy={copier} />
                   )}
-                  {(part.checklist || []).length > 0 && <VueChecklist items={part.checklist} />}
+                  {(part.checklist || []).length > 0 && <VueChecklist items={part.checklist} storageKey={`lisa-checklist-s${session.session_id}-p${index}-legacy`} />}
                 </>
               )}
             </div>

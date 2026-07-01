@@ -9,8 +9,10 @@ export default function DecouvertePage() {
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
 
+  const [prenom, setPrenom] = useState('')
   const [email, setEmail] = useState('')
   const [motDePasse, setMotDePasse] = useState('')
+  const [afficherMotDePasse, setAfficherMotDePasse] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -18,7 +20,7 @@ export default function DecouvertePage() {
     event.preventDefault()
     setError('')
 
-    if (!email.trim() || !motDePasse) {
+    if (!prenom.trim() || !email.trim() || !motDePasse) {
       setError('Merci de remplir tous les champs.')
       return
     }
@@ -33,6 +35,9 @@ export default function DecouvertePage() {
     const { error: signUpError } = await supabase.auth.signUp({
       email: email.trim(),
       password: motDePasse,
+      options: {
+        data: { prenom: prenom.trim() },
+      },
     })
 
     if (signUpError) {
@@ -96,6 +101,15 @@ export default function DecouvertePage() {
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <input
+            type="text"
+            placeholder="Ton prénom"
+            value={prenom}
+            onChange={(e) => setPrenom(e.target.value)}
+            style={inputStyle}
+            autoComplete="given-name"
+          />
+
+          <input
             type="email"
             placeholder="Ton adresse email"
             value={email}
@@ -104,14 +118,38 @@ export default function DecouvertePage() {
             autoComplete="email"
           />
 
-          <input
-            type="password"
-            placeholder="Choisis un mot de passe (8 caractères min.)"
-            value={motDePasse}
-            onChange={(e) => setMotDePasse(e.target.value)}
-            style={inputStyle}
-            autoComplete="new-password"
-          />
+          <div style={{ position: 'relative', width: '100%' }}>
+            <input
+              type={afficherMotDePasse ? 'text' : 'password'}
+              placeholder="Choisis un mot de passe (8 caractères min.)"
+              value={motDePasse}
+              onChange={(e) => setMotDePasse(e.target.value)}
+              style={{ ...inputStyle, paddingRight: '48px' }}
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              onClick={() => setAfficherMotDePasse((v) => !v)}
+              aria-label={afficherMotDePasse ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+              style={{
+                position: 'absolute',
+                right: '4px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '18px',
+                padding: '8px',
+                lineHeight: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {afficherMotDePasse ? '🙈' : '👁️'}
+            </button>
+          </div>
 
           {error && <p style={erreurStyle}>⚠️ {error}</p>}
 

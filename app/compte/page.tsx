@@ -16,15 +16,16 @@ const SUPABASE_ANON_KEY =
 const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 const BADGES = [
-  { label: 'Semaine 1', sessions: Array.from({length: 7}, (_, i) => i + 1), color: '#F472B6' },
-  { label: 'Semaine 2', sessions: Array.from({length: 7}, (_, i) => i + 8), color: '#A78BFA' },
-  { label: 'Semaine 3', sessions: Array.from({length: 7}, (_, i) => i + 15), color: '#67E8F9' },
-  { label: 'Semaine 4', sessions: Array.from({length: 9}, (_, i) => i + 22), color: '#FCD34D' },
+  { lettre: 'L', label: 'Semaine 1', sessions: Array.from({ length: 7 }, (_, i) => i + 1) },
+  { lettre: 'I', label: 'Semaine 2', sessions: Array.from({ length: 7 }, (_, i) => i + 8) },
+  { lettre: 'S', label: 'Semaine 3', sessions: Array.from({ length: 7 }, (_, i) => i + 15) },
+  { lettre: 'A', label: 'Semaine 4', sessions: Array.from({ length: 9 }, (_, i) => i + 22) },
 ]
 
 const APPAREIL_LABELS: Record<string, string> = {
   windows: '💻 Windows',
   apple: '🍎 Mac / Apple',
+  mac: '🍎 Mac / Apple',
   iphone: '📱 iPhone',
   android: '🤖 Android',
 }
@@ -34,7 +35,7 @@ function getAppareilLabel(raw: any): string {
   try {
     const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
     if (Array.isArray(parsed) && parsed.length > 0) {
-      return APPAREIL_LABELS[parsed[0]] || parsed[0]
+      return parsed.map((p: string) => APPAREIL_LABELS[p] || p).join(' · ')
     }
     if (typeof parsed === 'string') {
       return APPAREIL_LABELS[parsed] || parsed
@@ -48,6 +49,7 @@ function getAppareilLabel(raw: any): string {
 export default function ComptePage() {
   const router = useRouter()
   const [profile, setProfile] = useState<any>(null)
+  const [email, setEmail] = useState<string>('')
   const [completedIds, setCompletedIds] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -55,6 +57,8 @@ export default function ComptePage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/login'); return }
+
+      setEmail(user.email || '')
 
       const { data: prof } = await supabase
         .from('profiles')
@@ -81,7 +85,7 @@ export default function ComptePage() {
   }, [])
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{background:'#070014'}}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#070014' }}>
       <div className="text-white opacity-60 text-sm">Chargement...</div>
     </div>
   )
@@ -89,6 +93,11 @@ export default function ComptePage() {
   const totalSessions = 30
   const progressPct = Math.min(Math.round((completedIds.length / totalSessions) * 100), 100)
   const hasS30 = completedIds.includes(30)
+
+  // Nom affiché : prénom si dispo, sinon on n'affiche pas le début du mail
+  const prenomAffiche = profile?.first_name?.trim() || ''
+  const nomComplet = `${prenomAffiche} ${profile?.last_name || ''}`.trim()
+  const initiale = (prenomAffiche?.[0] || nomComplet?.[0] || '✦').toUpperCase()
 
   function badgeUnlocked(badge: typeof BADGES[0]) {
     return badge.sessions.every(id => completedIds.includes(id))
@@ -101,32 +110,59 @@ export default function ComptePage() {
   }
 
   return (
-    <div className="min-h-screen px-4 py-10" style={{background:'#070014'}}>
+    <div className="min-h-screen px-4 py-10" style={{ background: '#070014' }}>
       <div className="max-w-xl mx-auto space-y-6">
 
         {/* En-tête */}
         <div className="flex items-center gap-3 mb-2">
           <Link href="/dashboard" className="text-white opacity-40 hover:opacity-70 text-sm">
-            ← Retour
+            ← Retour au dashboard
           </Link>
         </div>
 
         {/* Profil */}
-        <div className="rounded-2xl p-6 border border-white/10" style={{background:'rgba(255,255,255,0.04)'}}>
+        <div className="rounded-2xl p-6 border border-white/10"
+          style={{ background: 'linear-gradient(135deg, rgba(244,114,182,0.08), rgba(167,139,250,0.06), rgba(103,232,249,0.05))' }}>
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold"
-              style={{background: 'linear-gradient(135deg, #F472B6, #A78BFA)'}}>
-              {(profile?.first_name?.[0] || '?').toUpperCase()}
-            </div>
-            <div>
-              <div className="text-white font-semibold text-lg">
-                {profile?.first_name} {profile?.last_name}
+            {/* Initiale stylée façon logo LISA */}
+            <div className="relative flex items-center justify-center flex-shrink-0"
+              style={{ width: '64px', height: '64px' }}>
+              <div className="absolute inset-0 rounded-full"
+                style={{
+                  background: 'linear-gradient(135deg, #F472B6, #A78BFA, #67E8F9)',
+                  opacity: 0.25,
+                  filter: 'blur(8px)',
+                }} />
+              <div className="relative flex items-center justify-center rounded-full"
+                style={{
+                  width: '64px',
+                  height: '64px',
+                  background: 'rgba(7,0,20,0.6)',
+                  border: '1.5px solid rgba(255,255,255,0.15)',
+                }}>
+                <span style={{
+                  fontSize: '30px',
+                  fontWeight: 800,
+                  fontFamily: "'Brush Script MT', 'Segoe Script', cursive",
+                  background: 'linear-gradient(135deg, #F472B6, #A78BFA, #67E8F9)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}>
+                  {initiale}
+                </span>
               </div>
-              <div className="text-white/40 text-sm">
+            </div>
+
+            <div className="min-w-0">
+              <div className="text-white font-semibold text-lg truncate">
+                {nomComplet || 'Bienvenue'}
+              </div>
+              <div className="text-white/40 text-sm truncate">
                 {getAppareilLabel(profile?.appareil_prefere)}
               </div>
             </div>
-            <div className="ml-auto">
+            <div className="ml-auto flex-shrink-0">
               <span className={`text-xs px-3 py-1 rounded-full font-medium ${
                 profile?.is_paid
                   ? 'bg-green-500/20 text-green-400'
@@ -139,41 +175,62 @@ export default function ComptePage() {
         </div>
 
         {/* Progression */}
-        <div className="rounded-2xl p-6 border border-white/10" style={{background:'rgba(255,255,255,0.04)'}}>
+        <div className="rounded-2xl p-6 border border-white/10" style={{ background: 'rgba(255,255,255,0.04)' }}>
           <div className="flex justify-between items-center mb-3">
             <span className="text-white/70 text-sm font-medium">Progression globale</span>
             <span className="text-white font-bold">{progressPct}%</span>
           </div>
-          <div className="w-full h-2 rounded-full" style={{background:'rgba(255,255,255,0.08)'}}>
-            <div className="h-2 rounded-full transition-all duration-700"
+          <div className="w-full h-2.5 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
+            <div className="h-2.5 rounded-full transition-all duration-700"
               style={{
                 width: `${progressPct}%`,
-                background: 'linear-gradient(90deg, #F472B6, #A78BFA, #67E8F9)'
-              }}/>
+                background: 'linear-gradient(90deg, #F472B6, #A78BFA, #67E8F9)',
+                boxShadow: '0 0 12px rgba(167,139,250,0.5)',
+              }} />
           </div>
           <div className="mt-3 text-white/40 text-xs">
             {completedIds.length} session{completedIds.length > 1 ? 's' : ''} terminée{completedIds.length > 1 ? 's' : ''} sur {totalSessions}
           </div>
         </div>
 
-        {/* Badges */}
-        <div className="rounded-2xl p-6 border border-white/10" style={{background:'rgba(255,255,255,0.04)'}}>
-          <div className="text-white/70 text-sm font-medium mb-4">Badges de progression</div>
-          <div className="grid grid-cols-2 gap-3">
+        {/* Badges L-I-S-A */}
+        <div className="rounded-2xl p-6 border border-white/10" style={{ background: 'rgba(255,255,255,0.04)' }}>
+          <div className="text-white/70 text-sm font-medium mb-1">Tes badges LISA</div>
+          <div className="text-white/35 text-xs mb-4">Débloque les 4 semaines pour reformer le logo complet.</div>
+          <div className="grid grid-cols-4 gap-3">
             {BADGES.map(badge => {
               const unlocked = badgeUnlocked(badge)
               const done = badge.sessions.filter(id => completedIds.includes(id)).length
               return (
                 <div key={badge.label}
-                  className="rounded-xl p-4 border transition-all"
+                  className="rounded-xl p-3 border transition-all flex flex-col items-center"
                   style={{
-                    borderColor: unlocked ? badge.color : 'rgba(255,255,255,0.08)',
-                    background: unlocked ? `${badge.color}15` : 'rgba(255,255,255,0.02)',
+                    borderColor: unlocked ? 'rgba(167,139,250,0.5)' : 'rgba(255,255,255,0.08)',
+                    background: unlocked
+                      ? 'linear-gradient(135deg, rgba(244,114,182,0.12), rgba(103,232,249,0.10))'
+                      : 'rgba(255,255,255,0.02)',
                   }}>
-                  <div className="text-2xl mb-1">{unlocked ? '✦' : '○'}</div>
-                  <div className="text-white text-sm font-semibold">{badge.label}</div>
-                  <div className="text-white/40 text-xs mt-1">
-                    {done}/{badge.sessions.length} sessions
+                  <span style={{
+                    fontSize: '34px',
+                    fontWeight: 800,
+                    lineHeight: 1,
+                    fontFamily: "'Brush Script MT', 'Segoe Script', cursive",
+                    ...(unlocked
+                      ? {
+                          background: 'linear-gradient(135deg, #F472B6, #A78BFA, #67E8F9)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          backgroundClip: 'text',
+                        }
+                      : { color: 'rgba(255,255,255,0.15)' }),
+                  }}>
+                    {badge.lettre}
+                  </span>
+                  <div className="text-white/50 text-[10px] mt-2 text-center leading-tight">
+                    {badge.label}
+                  </div>
+                  <div className="text-white/30 text-[10px] mt-0.5">
+                    {done}/{badge.sessions.length}
                   </div>
                 </div>
               )
@@ -185,8 +242,8 @@ export default function ComptePage() {
         {profile?.is_paid && (
           <div className="rounded-2xl p-6 border"
             style={{
-              borderColor: hasS30 ? '#FCD34D' : 'rgba(255,255,255,0.08)',
-              background: hasS30 ? 'rgba(252,211,77,0.06)' : 'rgba(255,255,255,0.02)'
+              borderColor: hasS30 ? 'rgba(252,211,77,0.5)' : 'rgba(255,255,255,0.08)',
+              background: hasS30 ? 'rgba(252,211,77,0.06)' : 'rgba(255,255,255,0.02)',
             }}>
             <div className="text-white/70 text-sm font-medium mb-2">Certificat de formation</div>
             {hasS30 ? (
@@ -196,7 +253,7 @@ export default function ComptePage() {
                 </p>
                 <button onClick={downloadCertificat}
                   className="w-full py-3 rounded-xl font-semibold text-sm transition-all hover:opacity-90"
-                  style={{background: 'linear-gradient(135deg, #FCD34D, #F472B6)', color: '#070014'}}>
+                  style={{ background: 'linear-gradient(135deg, #FCD34D, #F472B6)', color: '#070014' }}>
                   ⬇ Télécharger mon certificat
                 </button>
               </>
@@ -209,7 +266,7 @@ export default function ComptePage() {
         )}
 
         {/* Ressources */}
-        <div className="rounded-2xl p-6 border border-white/10" style={{background:'rgba(255,255,255,0.04)'}}>
+        <div className="rounded-2xl p-6 border border-white/10" style={{ background: 'rgba(255,255,255,0.04)' }}>
           <div className="text-white/70 text-sm font-medium mb-2">Ressources & Guides</div>
           <p className="text-white/30 text-xs">
             Tes guides PDF seront disponibles ici prochainement.
@@ -217,7 +274,7 @@ export default function ComptePage() {
         </div>
 
         {/* Communauté */}
-        <div className="rounded-2xl p-6 border border-white/10" style={{background:'rgba(255,255,255,0.04)'}}>
+        <div className="rounded-2xl p-6 border border-white/10" style={{ background: 'rgba(255,255,255,0.04)' }}>
           <div className="text-white/70 text-sm font-medium mb-2">Communauté LISA</div>
           <p className="text-white/40 text-xs mb-4">
             Rejoins le groupe privé pour échanger avec les autres apprenants.
@@ -226,13 +283,13 @@ export default function ComptePage() {
             <a href="https://www.facebook.com/share/1YPN2oMHJj/"
               target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 py-2 px-4 rounded-xl text-sm font-medium transition-all hover:opacity-80"
-              style={{background:'rgba(244,114,182,0.15)', color:'#F472B6', border:'1px solid rgba(244,114,182,0.3)'}}>
+              style={{ background: 'rgba(244,114,182,0.15)', color: '#F472B6', border: '1px solid rgba(244,114,182,0.3)' }}>
               👥 Rejoindre la communauté Facebook
             </a>
             <a href="https://www.instagram.com/je_suis_lisa_off?igsh=eG10d28wY2lqY2Zv"
               target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 py-2 px-4 rounded-xl text-sm font-medium transition-all hover:opacity-80"
-              style={{background:'rgba(167,139,250,0.15)', color:'#A78BFA', border:'1px solid rgba(167,139,250,0.3)'}}>
+              style={{ background: 'rgba(167,139,250,0.15)', color: '#A78BFA', border: '1px solid rgba(167,139,250,0.3)' }}>
               📸 Suivre sur Instagram
             </a>
           </div>
