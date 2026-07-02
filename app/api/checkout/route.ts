@@ -47,26 +47,34 @@ export async function POST(request: NextRequest) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || request.nextUrl.origin
   const stripe = getStripe()
 
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    payment_method_types: ['card'],
-    customer_email: user.email,
-    client_reference_id: user.id,
-    line_items: [
-      {
-        price: process.env.STRIPE_PRICE_ID!,
-        quantity: 1,
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      customer_email: user.email,
+      client_reference_id: user.id,
+      line_items: [
+        {
+          price: process.env.STRIPE_PRICE_ID!,
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        user_id: user.id,
+        retractation_waived: 'true',
       },
-    ],
-    metadata: {
-      user_id: user.id,
-      retractation_waived: 'true',
-    },
-    success_url: `${siteUrl}/dashboard?paiement=succes`,
-    cancel_url: `${siteUrl}/inscription?paiement=annule`,
-    locale: 'fr',
-    allow_promotion_codes: true,
-  })
+      success_url: `${siteUrl}/dashboard?paiement=succes`,
+      cancel_url: `${siteUrl}/inscription?paiement=annule`,
+      locale: 'fr',
+      allow_promotion_codes: true,
+    })
 
-  return NextResponse.json({ url: session.url })
+    return NextResponse.json({ url: session.url })
+  } catch (err) {
+    console.error('ERREUR STRIPE CHECKOUT:', err)
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : String(err) },
+      { status: 500 }
+    )
+  }
 }
