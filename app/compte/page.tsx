@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -16,10 +17,10 @@ const SUPABASE_ANON_KEY =
 const supabase = createBrowserClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 const BADGES = [
-  { lettre: 'L', label: 'Semaine 1', sessions: Array.from({ length: 7 }, (_, i) => i + 1) },
-  { lettre: 'I', label: 'Semaine 2', sessions: Array.from({ length: 7 }, (_, i) => i + 8) },
-  { lettre: 'S', label: 'Semaine 3', sessions: Array.from({ length: 7 }, (_, i) => i + 15) },
-  { lettre: 'A', label: 'Semaine 4', sessions: Array.from({ length: 9 }, (_, i) => i + 22) },
+  { lettre: 'L', label: 'Semaine 1', image: '/badges/badge-L.png', sessions: Array.from({ length: 7 }, (_, i) => i + 1) },
+  { lettre: 'i', label: 'Semaine 2', image: '/badges/badge-i.png', sessions: Array.from({ length: 7 }, (_, i) => i + 8) },
+  { lettre: 's', label: 'Semaine 3', image: '/badges/badge-s.png', sessions: Array.from({ length: 7 }, (_, i) => i + 15) },
+  { lettre: 'A', label: 'Semaine 4', image: '/badges/badge-A.png', sessions: Array.from({ length: 9 }, (_, i) => i + 22) },
 ]
 
 const APPAREIL_LABELS: Record<string, string> = {
@@ -46,7 +47,7 @@ function getAppareilLabel(raw: any): string {
   return 'Appareil non défini'
 }
 
-// Style néon lumineux façon logo LISA
+// Style néon lumineux façon logo LISA (utilisé pour l'initiale du profil)
 const neonText: React.CSSProperties = {
   fontFamily: "var(--font-lisa-cursive), 'Brush Script MT', cursive",
   background: 'linear-gradient(100deg, #FCA5C4 0%, #F472B6 20%, #C4A6F5 42%, #67E8F9 62%, #A78BFA 82%, #F9A8D4 100%)',
@@ -194,7 +195,7 @@ export default function ComptePage() {
           </div>
         </div>
 
-        {/* Badges L-I-S-A néon */}
+        {/* Badges LISA — lettres issues du logo officiel */}
         <div className="rounded-2xl p-6 border"
           style={{
             borderColor: 'rgba(167,139,250,0.20)',
@@ -216,19 +217,16 @@ export default function ComptePage() {
                       : 'rgba(255,255,255,0.02)',
                     boxShadow: unlocked ? '0 0 16px rgba(167,139,250,0.25)' : 'none',
                   }}>
-                  <span style={{
-                    fontSize: '52px',
-                    fontWeight: 700,
-                    lineHeight: 1.1,
-                    ...(unlocked
-                      ? neonText
-                      : {
-                          fontFamily: "var(--font-lisa-cursive), cursive",
-                          color: 'rgba(255,255,255,0.15)',
-                        }),
-                  }}>
-                    {badge.lettre}
-                  </span>
+                  <div className="relative w-full flex items-center justify-center"
+                    style={{ height: '56px', filter: unlocked ? 'none' : 'grayscale(1) brightness(0.4) opacity(0.35)' }}>
+                    <Image
+                      src={badge.image}
+                      alt={`Lettre ${badge.lettre} du logo LISA`}
+                      width={90}
+                      height={56}
+                      style={{ objectFit: 'contain', width: 'auto', height: '100%' }}
+                    />
+                  </div>
                   <div className="text-white/55 text-[10px] mt-2 text-center leading-tight">
                     {badge.label}
                   </div>
