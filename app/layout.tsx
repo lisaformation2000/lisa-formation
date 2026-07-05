@@ -38,14 +38,21 @@ export const metadata: Metadata = {
     "IA débutant",
     "formation en ligne IA",
   ],
-  authors: [{ name: "Nadia Farfar" }],
+  authors: [{ name: "N.F." }],
   manifest: "/manifest.webmanifest",
   icons: {
     icon: [
-      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/icons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+      { url: "/icons/favicon-64x64.png", sizes: "64x64", type: "image/png" },
+      { url: "/icons/icon-pwa-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-pwa-512x512.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    apple: [
+      { url: "/icons/icon-apple-180x180.png", sizes: "180x180", type: "image/png" },
+      { url: "/icons/icon-apple-167x167.png", sizes: "167x167", type: "image/png" },
+      { url: "/icons/icon-apple-152x152.png", sizes: "152x152", type: "image/png" },
+    ],
   },
   openGraph: {
     type: "website",
