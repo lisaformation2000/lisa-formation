@@ -32,12 +32,16 @@ export async function generateCertificat(
   // Fond noir
   page.drawRectangle({ x: 0, y: 0, width, height, color: BG })
 
-  // Fond image cosmique
-  const bgPath = path.join(process.cwd(), 'public', 'certificat-bg.png')
-  if (fs.existsSync(bgPath)) {
-    const bgBytes = fs.readFileSync(bgPath)
-    const bgImg = await pdfDoc.embedPng(bgBytes)
-    page.drawImage(bgImg, { x: 0, y: 0, width, height, opacity: 0.30 })
+  // Fond image cosmique (protégé — n'interrompt pas la génération si échec)
+  try {
+    const bgPath = path.join(process.cwd(), 'public', 'certificat-bg.png')
+    if (fs.existsSync(bgPath)) {
+      const bgBytes = fs.readFileSync(bgPath)
+      const bgImg = await pdfDoc.embedPng(bgBytes)
+      page.drawImage(bgImg, { x: 0, y: 0, width, height, opacity: 0.30 })
+    }
+  } catch (e) {
+    console.error('Erreur fond certificat:', e)
   }
 
   // Bordure violette extérieure
@@ -54,19 +58,23 @@ export async function generateCertificat(
     color: rgb(0, 0, 0), opacity: 0
   })
 
-  // Logo LisA
-  const logoPath = path.join(process.cwd(), 'public', 'logo-lisa-certificat.png')
+  // Logo LisA (protégé)
   const logoW = 260
   const logoH = 260
-  if (fs.existsSync(logoPath)) {
-    const logoBytes = fs.readFileSync(logoPath)
-    const logoImg = await pdfDoc.embedPng(logoBytes)
-    page.drawImage(logoImg, {
-      x: (width - logoW) / 2,
-      y: height - 35 - logoH,
-      width: logoW,
-      height: logoH,
-    })
+  try {
+    const logoPath = path.join(process.cwd(), 'public', 'logo-lisa-certificat.png')
+    if (fs.existsSync(logoPath)) {
+      const logoBytes = fs.readFileSync(logoPath)
+      const logoImg = await pdfDoc.embedPng(logoBytes)
+      page.drawImage(logoImg, {
+        x: (width - logoW) / 2,
+        y: height - 35 - logoH,
+        width: logoW,
+        height: logoH,
+      })
+    }
+  } catch (e) {
+    console.error('Erreur logo certificat:', e)
   }
 
   // Position Y de départ après le logo
