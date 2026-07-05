@@ -171,7 +171,6 @@ export default function DashboardPage() {
           setShowAppareil(true);
         }
 
-        // ── Progression depuis session_progress ──
         const { data: prog, error: progressError } = await supabase
           .from("session_progress")
           .select("session_id, completed")
@@ -180,7 +179,6 @@ export default function DashboardPage() {
         if (!progressError && prog) {
           const map: Record<number, boolean> = {};
           prog.forEach((p: any) => {
-            // FIX : on exclut la session 0 (Découverte) du comptage des 30 sessions
             if (p.session_id !== undefined && p.session_id >= 1 && p.session_id <= 30) {
               map[p.session_id] = Boolean(p.completed);
             }
@@ -221,7 +219,6 @@ export default function DashboardPage() {
     if (!user) return;
     setGenCertificat(true);
     try {
-      // FIX : route corrigée de /api/certificat vers /api/certificate
       window.open(`/api/certificate?userId=${user.id}`, '_blank');
     } finally {
       setGenCertificat(false);
@@ -238,29 +235,30 @@ export default function DashboardPage() {
 
   return (
     <main style={{ backgroundColor: "#070014", minHeight: "100vh", color: "#ffffff", fontFamily: "'Inter', sans-serif" }}>
-      <nav style={{ backgroundColor: "#000000", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <Link href="/" style={{ textDecoration: "none" }}>
-          <img src="/logoLisa.webp" alt="LISA" style={{ height: "120px", width: "auto" }} />
+      <nav style={{ backgroundColor: "#000000", padding: "16px 24px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(255,255,255,0.06)", gap: "12px", flexWrap: "wrap" }}>
+        <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
+          <img src="/logoLisa.webp" alt="LISA" style={{ height: "80px", width: "auto" }} />
         </Link>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          {/* ── Bonjour Nadia → cliquable vers /compte ── */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
           <Link href="/compte" style={{ textDecoration: "none" }}>
             <span style={{
               fontSize: "14px",
-              color: "rgba(255,255,255,0.6)",
+              color: "rgba(255,255,255,0.75)",
               cursor: "pointer",
-              padding: "6px 12px",
+              padding: "8px 14px",
               borderRadius: "8px",
-              border: "1px solid rgba(255,255,255,0.08)",
-              transition: "all 0.2s",
+              border: "1px solid rgba(167,139,250,0.3)",
+              background: "rgba(167,139,250,0.08)",
+              whiteSpace: "nowrap",
+              display: "inline-block",
             }}>
               Bonjour {prenom} 👋
             </span>
           </Link>
           <button
             onClick={handleDeconnexion}
-            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", color: "rgba(255,255,255,0.6)", cursor: "pointer" }}
+            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: "rgba(255,255,255,0.6)", cursor: "pointer", whiteSpace: "nowrap" }}
           >
             Déconnexion
           </button>
