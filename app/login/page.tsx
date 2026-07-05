@@ -82,12 +82,13 @@ function LoginForm() {
         onSubmit={handleSubmit}
         style={{
           background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.12)',
+          border: '1px solid rgba(167,139,250,0.25)',
           borderRadius: '20px',
           padding: '36px 32px',
           width: '100%',
           maxWidth: '420px',
           margin: '0 24px',
+          boxShadow: '0 0 40px rgba(167,139,250,0.12)',
         }}
       >
         <h1 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '8px' }}>Me connecter</h1>
@@ -179,7 +180,7 @@ const champStyle: React.CSSProperties = {
   width: '100%',
   padding: '12px 14px',
   background: 'rgba(255,255,255,0.06)',
-  border: '1px solid rgba(255,255,255,0.12)',
+  border: '1px solid rgba(167,139,250,0.3)',
   borderRadius: '10px',
   color: '#fff',
   fontSize: '15px',
@@ -197,6 +198,7 @@ const boutonStyle: React.CSSProperties = {
   fontSize: '16px',
   fontWeight: 700,
   cursor: 'pointer',
+  boxShadow: '0 0 24px rgba(167,139,250,0.35)',
 }
 
 const erreurStyle: React.CSSProperties = {

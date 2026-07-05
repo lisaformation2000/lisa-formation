@@ -14,7 +14,6 @@ export default function InscriptionPage() {
   const [dejaPaye, setDejaPaye] = useState(false)
 
   const [prenom, setPrenom] = useState('')
-  const [nom, setNom] = useState('')
   const [email, setEmail] = useState('')
   const [motDePasse, setMotDePasse] = useState('')
   const [confirmationMotDePasse, setConfirmationMotDePasse] = useState('')
@@ -33,11 +32,11 @@ export default function InscriptionPage() {
       if (data.session?.user) {
         setDejaConnecte(true)
         const { data: profile } = await supabase
-          .from('user_profile')
-          .select('has_paid')
-          .eq('user_id', data.session.user.id)
+          .from('profiles')
+          .select('is_paid')
+          .eq('id', data.session.user.id)
           .maybeSingle()
-        if (profile?.has_paid) setDejaPaye(true)
+        if (profile?.is_paid) setDejaPaye(true)
       }
       setCheckingSession(false)
     }
@@ -84,7 +83,7 @@ export default function InscriptionPage() {
     event.preventDefault()
     setError('')
 
-    if (!prenom.trim() || !nom.trim() || !email.trim() || !motDePasse) {
+    if (!prenom.trim() || !email.trim() || !motDePasse) {
       setError('Merci de remplir tous les champs.')
       return
     }
@@ -111,7 +110,7 @@ export default function InscriptionPage() {
       email: email.trim(),
       password: motDePasse,
       options: {
-        data: { prenom: prenom.trim(), nom: nom.trim() },
+        data: { prenom: prenom.trim() },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     })
@@ -236,7 +235,7 @@ export default function InscriptionPage() {
             ) : (
               <>
                 <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)', textAlign: 'center' }}>
-                  Tu es connecté(e). Plus qu'une étape pour débloquer les 30 sessions.
+                  Tu es connecté. Plus qu'une étape pour débloquer les 30 sessions.
                 </p>
                 <CasesLegales
                   accepteCGV={accepteCGV}
@@ -254,7 +253,6 @@ export default function InscriptionPage() {
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <input type="text" placeholder="Prénom" value={prenom} onChange={(e) => setPrenom(e.target.value)} style={inputStyle} autoComplete="given-name" />
-            <input type="text" placeholder="Nom" value={nom} onChange={(e) => setNom(e.target.value)} style={inputStyle} autoComplete="family-name" />
             <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} autoComplete="email" />
 
             <div style={{ position: 'relative', width: '100%' }}>
