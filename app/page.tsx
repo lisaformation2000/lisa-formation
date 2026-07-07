@@ -25,7 +25,7 @@ export default function Home() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Course',
-    name: "LISA â€” La formation pour débuter avec l'IA",
+    name: "LISA — La formation pour débuter avec l'IA",
     description:
       "Formation en ligne de 30 sessions pour apprendre à utiliser l'intelligence artificielle au quotidien, sans prérequis technique.",
     provider: {
@@ -109,24 +109,24 @@ export default function Home() {
             href="/inscription"
             className="rounded-full bg-gradient-to-r from-pink-400 via-purple-500 to-cyan-400 px-10 py-4 text-lg font-bold text-white transition hover:scale-105 mb-3 shadow-lg shadow-pink-500/30"
           >
-            Commencer pour 147â‚¬
+            Commencer pour 147€
           </Link>
         )}
 
-        <p className="text-sm text-gray-400 mb-4">Paiement unique â€” Accès à vie</p>
+        <p className="text-sm text-gray-400 mb-4">Paiement unique — Accès à vie</p>
 
         <Link
           href="/decouverte"
           className="text-sm text-purple-300 border border-purple-400 rounded-full px-6 py-2 hover:bg-purple-400 hover:text-white transition mb-3"
         >
-          âœ¨ Essayer la session découverte gratuite
+          ✨ Essayer la session découverte gratuite
         </Link>
 
         <Link
           href="/programme"
           className="text-sm text-cyan-300 border border-cyan-400 rounded-full px-6 py-2 hover:bg-cyan-400 hover:text-white transition"
         >
-          ðŸ“‹ Découvrir le programme complet
+          📋 Découvrir le programme complet
         </Link>
       </div>
 
@@ -135,7 +135,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
           <div className="bg-gray-900 rounded-2xl p-6 flex flex-col items-center text-center border border-gray-800">
             <div className="w-16 h-16 mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F472B6, #fb923c)' }}>
-              <span className="text-3xl">ðŸ› ï¸</span>
+              <span className="text-3xl">🛠️</span>
             </div>
             <h3 className="font-bold text-lg mb-2 text-pink-400">Les outils</h3>
             <p className="text-gray-400 text-sm">Les meilleurs outils IA et comment les utiliser efficacement.</p>
@@ -143,7 +143,7 @@ export default function Home() {
 
           <div className="bg-gray-900 rounded-2xl p-6 flex flex-col items-center text-center border border-gray-800">
             <div className="w-16 h-16 mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #FCD34D, #fb923c)' }}>
-              <span className="text-3xl">âš¡</span>
+              <span className="text-3xl">⚡</span>
             </div>
             <h3 className="font-bold text-lg mb-2 text-yellow-400">Gagner du temps</h3>
             <p className="text-gray-400 text-sm">Automatiser les tâches répétitives et booster ta productivité.</p>
@@ -151,7 +151,7 @@ export default function Home() {
 
           <div className="bg-gray-900 rounded-2xl p-6 flex flex-col items-center text-center border border-gray-800">
             <div className="w-16 h-16 mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #A78BFA, #F472B6)' }}>
-              <span className="text-3xl">ðŸ§ </span>
+              <span className="text-3xl">🧠</span>
             </div>
             <h3 className="font-bold text-lg mb-2 text-purple-400">L'esprit critique</h3>
             <p className="text-gray-400 text-sm">Comprendre, analyser et utiliser l'IA de manière intelligente.</p>
@@ -166,7 +166,7 @@ export default function Home() {
       </div>
 
       <div className="text-center text-gray-600 text-xs pb-8 px-6">
-        <p>© 2026 LISA â€” La formation pour débuter avec l'IA</p>
+        <p>© 2026 LISA — La formation pour débuter avec l'IA</p>
         <div className="flex flex-wrap justify-center gap-4 mt-2">
           <Link href="/cgv" className="hover:text-gray-400">CGV</Link>
           <Link href="/conditions-utilisation" className="hover:text-gray-400">Conditions d'utilisation</Link>
@@ -179,5 +179,3 @@ export default function Home() {
     </main>
   );
 }
-
-

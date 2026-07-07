@@ -25,7 +25,7 @@
         <h2 className="text-xl font-bold text-violet-300 mb-4">2. Données collectées</h2>
         <h3 className="text-base font-semibold text-white mb-2">Lors de l'inscription</h3>
         <p className="text-gray-300 text-sm leading-relaxed mb-4">
-          Adresse email, prénom â€” utilisés pour créer ton compte et t'envoyer tes accès.
+          Adresse email, prénom — utilisés pour créer ton compte et t'envoyer tes accès.
         </p>
         <h3 className="text-base font-semibold text-white mb-2">Lors du paiement</h3>
         <p className="text-gray-300 text-sm leading-relaxed mb-4">
@@ -33,7 +33,7 @@
         </p>
         <h3 className="text-base font-semibold text-white mb-2">Lors de l'utilisation du site</h3>
         <p className="text-gray-300 text-sm leading-relaxed mb-4">
-          Données de connexion (date, heure, sessions consultées) â€” utilisées pour assurer le bon fonctionnement de ton espace membre et te délivrer ton attestation à la session 30.
+          Données de connexion (date, heure, sessions consultées) — utilisées pour assurer le bon fonctionnement de ton espace membre et te délivrer ton attestation à la session 30.
         </p>
         <h3 className="text-base font-semibold text-white mb-2">Emails automatiques</h3>
         <p className="text-gray-300 text-sm leading-relaxed">
@@ -53,8 +53,8 @@
             </thead>
             <tbody>
               {[
-                ["Email + prénom", "Création du compte â€” envoi des accès â€” emails de suivi"],
-                ["Données de connexion", "Suivi de progression â€” génération du certificat"],
+                ["Email + prénom", "Création du compte — envoi des accès — emails de suivi"],
+                ["Données de connexion", "Suivi de progression — génération du certificat"],
                 ["Données de paiement", "Traitement de la transaction (via Stripe uniquement)"],
               ].map(([donnee, finalite], i) => (
                 <tr key={donnee} className={`border-t border-white/10 ${i % 2 === 1 ? "bg-white/5" : ""}`}>
@@ -73,7 +73,7 @@
           Tes données sont conservées pendant toute la durée de ton accès à la formation et pendant les délais légaux applicables (10 ans pour les données comptables).
         </p>
         <p className="text-gray-300 text-sm leading-relaxed">
-          Ã€ ta demande, nous pouvons supprimer ton compte. La suppression entraîne la perte de l'accès à la formation.
+          À ta demande, nous pouvons supprimer ton compte. La suppression entraîne la perte de l'accès à la formation.
         </p>
       </section>
 
@@ -164,11 +164,7 @@
         </p>
       </section>
 
-      <p className="text-center text-gray-600 text-xs mt-16">© N.F. â€” Lisa Formation IA â€” Tous droits réservés</p>
+      <p className="text-center text-gray-600 text-xs mt-16">© N.F. — Lisa Formation IA — Tous droits réservés</p>
     </main>
   );
 }
-
-
-
-
