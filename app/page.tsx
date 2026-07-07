@@ -68,7 +68,7 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col items-center px-4 pt-2 pb-6">
-        <img src="/logo-lisa.png" alt="LISA" className="w-full max-w-[800px] h-auto" />
+        <img src="/logo-lisa.png" alt="LISA" width="720" height="546" className="w-full max-w-[800px] h-auto" />
         <div className="flex gap-2 mt-2">
           <span className="w-2 h-2 rounded-full bg-pink-400 inline-block"></span>
           <span className="w-2 h-2 rounded-full bg-purple-400 inline-block"></span>
