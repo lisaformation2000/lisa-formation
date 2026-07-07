@@ -1,10 +1,11 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import RessourcesSection from './ressources'
 
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
@@ -47,7 +48,6 @@ function getAppareilLabel(raw: any): string {
   return 'Appareil non défini'
 }
 
-// Style néon lumineux façon logo LISA (utilisé pour l'initiale du profil)
 const neonText: React.CSSProperties = {
   fontFamily: "var(--font-lisa-cursive), 'Brush Script MT', cursive",
   background: 'linear-gradient(100deg, #FCA5C4 0%, #F472B6 20%, #C4A6F5 42%, #67E8F9 62%, #A78BFA 82%, #F9A8D4 100%)',
@@ -57,7 +57,6 @@ const neonText: React.CSSProperties = {
   filter: 'drop-shadow(0 0 6px rgba(167,139,250,0.55)) drop-shadow(0 0 12px rgba(103,232,249,0.35))',
 }
 
-// Style dégradé pour le titre "Tes badges LISA"
 const titleGradient: React.CSSProperties = {
   background: 'linear-gradient(90deg, #A78BFA 0%, #C4A6F5 30%, #F472B6 65%, #F9A8D4 100%)',
   WebkitBackgroundClip: 'text',
@@ -128,21 +127,18 @@ export default function ComptePage() {
     <div className="min-h-screen px-4 py-10" style={{ background: '#070014' }}>
       <div className="max-w-xl mx-auto space-y-6">
 
-        {/* En-tête */}
         <div className="flex items-center gap-3 mb-2">
           <Link href="/dashboard" className="text-white opacity-40 hover:opacity-70 text-sm">
             ← Retour au dashboard
           </Link>
         </div>
 
-        {/* Profil */}
         <div className="rounded-2xl p-6 border"
           style={{
             borderColor: 'rgba(167,139,250,0.25)',
             background: 'linear-gradient(135deg, rgba(244,114,182,0.14), rgba(167,139,250,0.10), rgba(103,232,249,0.08))',
           }}>
           <div className="flex items-start gap-4 flex-wrap">
-            {/* Initiale néon façon logo */}
             <div className="relative flex items-center justify-center flex-shrink-0"
               style={{ width: '68px', height: '68px' }}>
               <div className="absolute inset-0 rounded-full"
@@ -184,7 +180,6 @@ export default function ComptePage() {
           </div>
         </div>
 
-        {/* Progression */}
         <div className="rounded-2xl p-6 border" style={{ borderColor: 'rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.04)' }}>
           <div className="flex justify-between items-center mb-3">
             <span className="text-white/70 text-sm font-medium">Progression globale</span>
@@ -203,7 +198,6 @@ export default function ComptePage() {
           </div>
         </div>
 
-        {/* Badges LISA — lettres issues du logo officiel */}
         <div className="rounded-2xl p-6 border"
           style={{
             borderColor: 'rgba(167,139,250,0.20)',
@@ -261,7 +255,6 @@ export default function ComptePage() {
             })}
           </div>
 
-          {/* Bandeau explicatif en bas */}
           <div className="mt-5 rounded-xl p-4 border flex items-center gap-3"
             style={{ borderColor: 'rgba(167,139,250,0.20)', background: 'rgba(255,255,255,0.03)' }}>
             <div className="flex items-center justify-center rounded-full flex-shrink-0"
@@ -277,7 +270,6 @@ export default function ComptePage() {
           </div>
         </div>
 
-        {/* Certificat */}
         {profile?.is_paid && (
           <div className="rounded-2xl p-6 border"
             style={{
@@ -305,14 +297,8 @@ export default function ComptePage() {
         )}
 
         {/* Ressources */}
-        <div className="rounded-2xl p-6 border border-white/10" style={{ background: 'rgba(255,255,255,0.04)' }}>
-          <div className="text-white/70 text-sm font-medium mb-2">Ressources & Guides</div>
-          <p className="text-white/30 text-xs">
-            Tes guides PDF seront disponibles ici prochainement.
-          </p>
-        </div>
+        <RessourcesSection />
 
-        {/* Communauté */}
         <div className="rounded-2xl p-6 border border-white/10" style={{ background: 'rgba(255,255,255,0.04)' }}>
           <div className="text-white/70 text-sm font-medium mb-2">Communauté LISA</div>
           <p className="text-white/40 text-xs mb-4">
