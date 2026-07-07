@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -25,9 +25,9 @@ export default function Home() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Course',
-    name: "LISA — La formation pour débuter avec l'IA",
+    name: "LISA â€” La formation pour dÃ©buter avec l'IA",
     description:
-      "Formation en ligne de 30 sessions pour apprendre à utiliser l'intelligence artificielle au quotidien, sans prérequis technique.",
+      "Formation en ligne de 30 sessions pour apprendre Ã  utiliser l'intelligence artificielle au quotidien, sans prÃ©requis technique.",
     provider: {
       '@type': 'Organization',
       name: 'LISA',
@@ -55,14 +55,14 @@ export default function Home() {
             href="/dashboard"
             className="text-sm font-bold text-white rounded-full px-4 py-2 transition bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 hover:scale-105"
           >
-            Accéder à ma formation
+            AccÃ©der Ã  ma formation
           </Link>
         ) : (
           <Link
             href="/login"
             className="text-sm font-bold text-white rounded-full px-4 py-2 transition bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 hover:scale-105"
           >
-            Déjà membre ? Se connecter
+            DÃ©jÃ  membre ? Se connecter
           </Link>
         )}
       </div>
@@ -78,7 +78,7 @@ export default function Home() {
 
       <div className="flex flex-col items-center text-center px-6 pb-12">
         <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">
-          Apprends à utiliser<br />
+          Apprends Ã  utiliser<br />
           l'IA en{' '}
           <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
             30 sessions
@@ -93,7 +93,7 @@ export default function Home() {
         </p>
 
         <p className="text-gray-300 mb-8">
-          Tu n'as pas besoin d'être expert.<br />
+          Tu n'as pas besoin d'Ãªtre expert.<br />
           Tu as juste besoin de commencer.
         </p>
 
@@ -102,40 +102,40 @@ export default function Home() {
             href="/dashboard"
             className="rounded-full bg-gradient-to-r from-pink-400 via-purple-500 to-cyan-400 px-10 py-4 text-lg font-bold text-white transition hover:scale-105 mb-3 shadow-lg shadow-pink-500/30"
           >
-            Accéder à ma formation
+            AccÃ©der Ã  ma formation
           </Link>
         ) : (
           <Link
             href="/inscription"
             className="rounded-full bg-gradient-to-r from-pink-400 via-purple-500 to-cyan-400 px-10 py-4 text-lg font-bold text-white transition hover:scale-105 mb-3 shadow-lg shadow-pink-500/30"
           >
-            Commencer pour 147€
+            Commencer pour 147â‚¬
           </Link>
         )}
 
-        <p className="text-sm text-gray-400 mb-4">Paiement unique — Accès à vie</p>
+        <p className="text-sm text-gray-400 mb-4">Paiement unique â€” AccÃ¨s Ã  vie</p>
 
         <Link
           href="/decouverte"
           className="text-sm text-purple-300 border border-purple-400 rounded-full px-6 py-2 hover:bg-purple-400 hover:text-white transition mb-3"
         >
-          ✨ Essayer la session découverte gratuite
+          âœ¨ Essayer la session dÃ©couverte gratuite
         </Link>
 
         <Link
           href="/programme"
           className="text-sm text-cyan-300 border border-cyan-400 rounded-full px-6 py-2 hover:bg-cyan-400 hover:text-white transition"
         >
-          📋 Découvrir le programme complet
+          ðŸ“‹ DÃ©couvrir le programme complet
         </Link>
       </div>
 
       <div className="flex flex-col items-center px-6 pb-16">
-        <h2 className="text-2xl font-bold mb-8">Ce que tu vas maîtriser</h2>
+        <h2 className="text-2xl font-bold mb-8">Ce que tu vas maÃ®triser</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
           <div className="bg-gray-900 rounded-2xl p-6 flex flex-col items-center text-center border border-gray-800">
             <div className="w-16 h-16 mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #F472B6, #fb923c)' }}>
-              <span className="text-3xl">🛠️</span>
+              <span className="text-3xl">ðŸ› ï¸</span>
             </div>
             <h3 className="font-bold text-lg mb-2 text-pink-400">Les outils</h3>
             <p className="text-gray-400 text-sm">Les meilleurs outils IA et comment les utiliser efficacement.</p>
@@ -143,18 +143,18 @@ export default function Home() {
 
           <div className="bg-gray-900 rounded-2xl p-6 flex flex-col items-center text-center border border-gray-800">
             <div className="w-16 h-16 mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #FCD34D, #fb923c)' }}>
-              <span className="text-3xl">⚡</span>
+              <span className="text-3xl">âš¡</span>
             </div>
             <h3 className="font-bold text-lg mb-2 text-yellow-400">Gagner du temps</h3>
-            <p className="text-gray-400 text-sm">Automatiser les tâches répétitives et booster ta productivité.</p>
+            <p className="text-gray-400 text-sm">Automatiser les tÃ¢ches rÃ©pÃ©titives et booster ta productivitÃ©.</p>
           </div>
 
           <div className="bg-gray-900 rounded-2xl p-6 flex flex-col items-center text-center border border-gray-800">
             <div className="w-16 h-16 mb-4 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #A78BFA, #F472B6)' }}>
-              <span className="text-3xl">🧠</span>
+              <span className="text-3xl">ðŸ§ </span>
             </div>
             <h3 className="font-bold text-lg mb-2 text-purple-400">L'esprit critique</h3>
-            <p className="text-gray-400 text-sm">Comprendre, analyser et utiliser l'IA de manière intelligente.</p>
+            <p className="text-gray-400 text-sm">Comprendre, analyser et utiliser l'IA de maniÃ¨re intelligente.</p>
           </div>
         </div>
 
@@ -166,15 +166,17 @@ export default function Home() {
       </div>
 
       <div className="text-center text-gray-600 text-xs pb-8 px-6">
-        <p>© 2026 LISA — La formation pour débuter avec l'IA</p>
+        <p>Â© 2026 LISA â€” La formation pour dÃ©buter avec l'IA</p>
         <div className="flex flex-wrap justify-center gap-4 mt-2">
           <Link href="/cgv" className="hover:text-gray-400">CGV</Link>
           <Link href="/conditions-utilisation" className="hover:text-gray-400">Conditions d'utilisation</Link>
-          <Link href="/mentions-legales" className="hover:text-gray-400">Mentions légales</Link>
-          <Link href="/confidentialite" className="hover:text-gray-400">Confidentialité</Link>
-          <Link href="/retractation" className="hover:text-gray-400">Droit de rétractation</Link>
+          <Link href="/mentions-legales" className="hover:text-gray-400">Mentions lÃ©gales</Link>
+          <Link href="/confidentialite" className="hover:text-gray-400">ConfidentialitÃ©</Link>
+          <Link href="/faq" className="hover:text-gray-400">FAQ</Link>
+          <Link href="/retractation" className="hover:text-gray-400">Droit de rÃ©tractation</Link>
         </div>
       </div>
     </main>
   );
 }
+
