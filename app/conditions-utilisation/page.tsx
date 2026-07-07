@@ -49,7 +49,7 @@
           <p className="text-gray-300 text-sm leading-relaxed">
             L'ensemble du contenu disponible sur la plateforme â€” sessions, PDF, exercices, prompts, supports â€” est la propriété exclusive de N.F.. Toute utilisation non autorisée constitue une violation du droit d'auteur.
           </p>
-          <p className="text-gray-400 text-xs mt-3">Â© N.F. â€” Lisa Formation IA â€” Tous droits réservés</p>
+          <p className="text-gray-400 text-xs mt-3">© N.F. â€” Lisa Formation IA â€” Tous droits réservés</p>
         </section>
   
         <section className="mb-10">
@@ -114,10 +114,11 @@
           </p>
         </section>
   
-        <p className="text-center text-gray-600 text-xs mt-16">Â© N.F. â€” Lisa Formation IA â€” Tous droits réservés</p>
+        <p className="text-center text-gray-600 text-xs mt-16">© N.F. â€” Lisa Formation IA â€” Tous droits réservés</p>
       </main>
     );
   }
+
 
 
 

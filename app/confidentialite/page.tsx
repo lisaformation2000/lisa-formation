@@ -164,10 +164,11 @@
         </p>
       </section>
 
-      <p className="text-center text-gray-600 text-xs mt-16">Â© N.F. â€” Lisa Formation IA â€” Tous droits réservés</p>
+      <p className="text-center text-gray-600 text-xs mt-16">© N.F. â€” Lisa Formation IA â€” Tous droits réservés</p>
     </main>
   );
 }
+
 
 
 

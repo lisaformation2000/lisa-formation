@@ -162,7 +162,7 @@ export default function CGV() {
           <p className="text-gray-300 text-sm leading-relaxed mb-2">
             L'intégralité du contenu de la formation est la propriété exclusive de N.F.. Toute reproduction ou diffusion sans autorisation écrite est interdite.
           </p>
-          <p className="text-gray-400 text-xs">Â© N.F. â€” Lisa Formation IA â€” Tous droits réservés</p>
+          <p className="text-gray-400 text-xs">© N.F. â€” Lisa Formation IA â€” Tous droits réservés</p>
         </section>
 
         <section className="mb-10">
@@ -214,10 +214,11 @@ export default function CGV() {
           </p>
         </section>
   
-        <p className="text-center text-gray-600 text-xs mt-16">Â© N.F. â€” Lisa Formation IA â€” Tous droits réservés</p>
+        <p className="text-center text-gray-600 text-xs mt-16">© N.F. â€” Lisa Formation IA â€” Tous droits réservés</p>
       </main>
     );
   }
+
 
 
 
