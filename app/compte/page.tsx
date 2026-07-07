@@ -57,6 +57,14 @@ const neonText: React.CSSProperties = {
   filter: 'drop-shadow(0 0 6px rgba(167,139,250,0.55)) drop-shadow(0 0 12px rgba(103,232,249,0.35))',
 }
 
+// Style dégradé pour le titre "Tes badges LISA"
+const titleGradient: React.CSSProperties = {
+  background: 'linear-gradient(90deg, #A78BFA 0%, #C4A6F5 30%, #F472B6 65%, #F9A8D4 100%)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+}
+
 export default function ComptePage() {
   const router = useRouter()
   const [profile, setProfile] = useState<any>(null)
@@ -133,7 +141,7 @@ export default function ComptePage() {
             borderColor: 'rgba(167,139,250,0.25)',
             background: 'linear-gradient(135deg, rgba(244,114,182,0.14), rgba(167,139,250,0.10), rgba(103,232,249,0.08))',
           }}>
-          <div className="flex items-center gap-4">
+          <div className="flex items-start gap-4 flex-wrap">
             {/* Initiale néon façon logo */}
             <div className="relative flex items-center justify-center flex-shrink-0"
               style={{ width: '68px', height: '68px' }}>
@@ -156,16 +164,16 @@ export default function ComptePage() {
               </div>
             </div>
 
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="text-white font-semibold text-lg truncate">
                 {nomComplet || 'Bienvenue'}
               </div>
-              <div className="text-white/45 text-sm truncate">
+              <div className="text-white/45 text-sm whitespace-normal break-words leading-snug">
                 {getAppareilLabel(profile?.appareil_prefere)}
               </div>
             </div>
-            <div className="ml-auto flex-shrink-0">
-              <span className={`text-xs px-3 py-1 rounded-full font-medium ${
+            <div className="flex-shrink-0">
+              <span className={`text-xs px-3 py-1 rounded-full font-medium whitespace-nowrap ${
                 profile?.is_paid
                   ? 'bg-green-500/20 text-green-400'
                   : 'bg-white/10 text-white/40'
@@ -201,12 +209,20 @@ export default function ComptePage() {
             borderColor: 'rgba(167,139,250,0.20)',
             background: 'linear-gradient(160deg, rgba(167,139,250,0.08), rgba(103,232,249,0.05))',
           }}>
-          <div className="text-white/75 text-sm font-medium mb-1">Tes badges LISA</div>
-          <div className="text-white/40 text-xs mb-5">Débloque les 4 semaines pour reformer le logo complet.</div>
+          <div className="text-center mb-5">
+            <h3 className="text-xl font-bold mb-1" style={titleGradient}>
+              Tes badges LISA
+            </h3>
+            <p className="text-white/45 text-xs">
+              Débloque les 4 semaines pour reformer le logo complet.
+            </p>
+          </div>
+
           <div className="grid grid-cols-4 gap-3">
             {BADGES.map(badge => {
               const unlocked = badgeUnlocked(badge)
               const done = badge.sessions.filter(id => completedIds.includes(id)).length
+              const badgePct = Math.round((done / badge.sessions.length) * 100)
               return (
                 <div key={badge.label}
                   className="rounded-xl p-3 border transition-all flex flex-col items-center"
@@ -230,12 +246,34 @@ export default function ComptePage() {
                   <div className="text-white/55 text-[10px] mt-2 text-center leading-tight">
                     {badge.label}
                   </div>
-                  <div className="text-white/35 text-[10px] mt-0.5">
+                  <div className="text-white/35 text-[10px] mt-0.5 mb-2">
                     {done}/{badge.sessions.length}
+                  </div>
+                  <div className="w-full h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.08)' }}>
+                    <div className="h-1.5 rounded-full transition-all duration-700"
+                      style={{
+                        width: `${badgePct}%`,
+                        background: 'linear-gradient(90deg, #F472B6, #A78BFA, #67E8F9)',
+                      }} />
                   </div>
                 </div>
               )
             })}
+          </div>
+
+          {/* Bandeau explicatif en bas */}
+          <div className="mt-5 rounded-xl p-4 border flex items-center gap-3"
+            style={{ borderColor: 'rgba(167,139,250,0.20)', background: 'rgba(255,255,255,0.03)' }}>
+            <div className="flex items-center justify-center rounded-full flex-shrink-0"
+              style={{ width: '38px', height: '38px', border: '1.5px solid rgba(167,139,250,0.4)' }}>
+              <span style={{ ...neonText, fontSize: '18px' }}>✦</span>
+            </div>
+            <p className="text-white/50 text-xs leading-snug flex-1">
+              Complète chaque semaine pour faire apparaître une lettre et reformer le logo LISA.
+            </p>
+            <span style={{ ...neonText, fontSize: '22px', fontWeight: 700 }} className="flex-shrink-0">
+              LisA
+            </span>
           </div>
         </div>
 
