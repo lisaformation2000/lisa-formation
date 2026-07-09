@@ -1,22 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Webhook } from "standardwebhooks";
 
 export async function POST(req: NextRequest) {
+  // Important : ce hook se déclenche AVANT la création du compte utilisateur.
+  // On ne doit JAMAIS bloquer une vraie inscription, même en cas d'erreur.
   try {
-    const body = await req.json();
+    const payload = await req.text();
 
-    // Vérification simple du secret partagé (à définir dans les variables d'env Vercel)
-    const secret = req.headers.get("x-webhook-secret");
-    if (secret !== process.env.SIGNUP_WEBHOOK_SECRET) {
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    const headers = {
+      "webhook-id": req.headers.get("webhook-id") || "",
+      "webhook-timestamp": req.headers.get("webhook-timestamp") || "",
+      "webhook-signature": req.headers.get("webhook-signature") || "",
+    };
+
+    const secret = process.env.SIGNUP_WEBHOOK_SECRET || "";
+    const wh = new Webhook(secret);
+
+    let data: any;
+    try {
+      data = wh.verify(payload, headers);
+    } catch (verifyError) {
+      console.error("Signature webhook invalide:", verifyError);
+      // On ne bloque jamais une inscription réelle, même si la signature échoue.
+      return NextResponse.json({}, { status: 200 });
     }
 
-    const email = body?.user?.email || body?.record?.email || body?.email;
+    const email = data?.user?.email || "email inconnu";
 
-    if (!email) {
-      return NextResponse.json({ error: "missing email" }, { status: 400 });
-    }
-
-    const brevoResponse = await fetch("https://api.brevo.com/v3/smtp/email", {
+    // Envoi de l'email en arrière-plan, sans jamais bloquer la réponse
+    fetch("https://api.brevo.com/v3/smtp/email", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,17 +45,13 @@ export async function POST(req: NextRequest) {
           <p>Date : ${new Date().toLocaleString("fr-FR")}</p>
         </body></html>`,
       }),
+    }).catch((err) => {
+      console.error("Erreur envoi Brevo (non bloquant):", err);
     });
 
-    if (!brevoResponse.ok) {
-      const errText = await brevoResponse.text();
-      console.error("Erreur Brevo:", errText);
-      return NextResponse.json({ error: "brevo failed" }, { status: 500 });
-    }
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({}, { status: 200 });
   } catch (error) {
-    console.error("Erreur notify-signup:", error);
-    return NextResponse.json({ error: "internal error" }, { status: 500 });
+    console.error("Erreur notify-signup (non bloquant):", error);
+    return NextResponse.json({}, { status: 200 });
   }
 }
