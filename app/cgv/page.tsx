@@ -6,7 +6,7 @@ export default function CGV() {
         <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-pink-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
           Conditions Générales de Vente
         </h1>
-        <p className="text-gray-400 text-sm mb-12">Dernière mise à jour : juin 2026</p>
+        <p className="text-gray-400 text-sm mb-12">Dernière mise à jour : juillet 2026</p>
   
         <section className="mb-10">
           <h2 className="text-xl font-bold text-violet-300 mb-4">1. Identification du vendeur</h2>
@@ -78,9 +78,30 @@ export default function CGV() {
   
         <section className="mb-10">
           <h2 className="text-xl font-bold text-violet-300 mb-4">5. Modalités de paiement</h2>
-          <p className="text-gray-300 text-sm leading-relaxed">
-            Le paiement est effectué en ligne, au moment de la commande, par carte bancaire via la plateforme sécurisée Stripe. La commande n'est validée qu'après confirmation du paiement. Un email de confirmation est envoyé automatiquement.
+          <p className="text-gray-300 text-sm leading-relaxed mb-4">
+            Le paiement est effectué en ligne, au moment de la commande, via la plateforme sécurisée Stripe. La commande n'est validée qu'après confirmation du paiement. Un email de confirmation est envoyé automatiquement.
           </p>
+          <p className="text-gray-300 text-sm leading-relaxed mb-4">
+            Deux moyens de paiement sont proposés :
+          </p>
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-3 text-gray-300 text-sm mb-4">
+            <p><span className="text-white font-medium">Carte bancaire :</span> paiement immédiat et intégral de 147 € (ou 127 € en cas de code promotionnel ou parrainage valide).</p>
+            <p><span className="text-white font-medium">Klarna :</span> solution de paiement tierce proposant, selon éligibilité déterminée par Klarna, un paiement en une fois ou un paiement différé/fractionné en plusieurs échéances.</p>
+          </div>
+          <div className="border-l-4 border-pink-400 bg-pink-500/10 rounded-r-xl px-5 py-4 text-gray-300 text-sm space-y-2">
+            <p>
+              Klarna est un établissement de paiement tiers, indépendant de N.F., soumis à ses propres conditions générales d'utilisation et à sa propre politique de confidentialité, consultables sur{" "}
+              <a href="https://www.klarna.com/fr/conditions-generales/" target="_blank" rel="noopener noreferrer" className="text-violet-300 underline hover:text-violet-200">
+                klarna.com
+              </a>.
+            </p>
+            <p>
+              L'éligibilité au paiement fractionné, le nombre d'échéances proposées et les éventuels frais associés sont déterminés par Klarna au moment de la commande, selon des critères propres à Klarna (montant, historique, vérification d'identité). N.F. n'intervient pas dans cette décision et ne perçoit aucune commission liée au choix du paiement fractionné.
+            </p>
+            <p>
+              En choisissant Klarna comme moyen de paiement, l'acheteur contracte directement avec Klarna pour les modalités de paiement différé ou fractionné, et reste seul responsable du respect des échéances convenues avec Klarna.
+            </p>
+          </div>
         </section>
   
         <section className="mb-10">
