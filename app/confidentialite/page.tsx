@@ -4,7 +4,7 @@
       <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-pink-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
         Politique de confidentialité
       </h1>
-      <p className="text-gray-400 text-sm mb-6">Dernière mise à jour : juin 2026</p>
+      <p className="text-gray-400 text-sm mb-6">Dernière mise à jour : juillet 2026</p>
 
       <div className="border-l-4 border-violet-400 bg-violet-500/10 rounded-r-xl px-5 py-4 mb-12 text-gray-300 text-sm italic">
         Nous respectons ta vie privée. Cette page t'explique clairement quelles données nous collectons, pourquoi, et comment tu peux exercer tes droits.
@@ -29,15 +29,18 @@
         </p>
         <h3 className="text-base font-semibold text-white mb-2">Lors du paiement</h3>
         <p className="text-gray-300 text-sm leading-relaxed mb-4">
-          Le paiement est traité par Stripe. Nous ne stockons jamais tes données bancaires.
+          Le paiement est traité par Stripe (carte bancaire ou Klarna). Nous ne stockons jamais tes données bancaires.
         </p>
         <h3 className="text-base font-semibold text-white mb-2">Lors de l'utilisation du site</h3>
         <p className="text-gray-300 text-sm leading-relaxed mb-4">
           Données de connexion (date, heure, sessions consultées) — utilisées pour assurer le bon fonctionnement de ton espace membre et te délivrer ton attestation à la session 30.
         </p>
         <h3 className="text-base font-semibold text-white mb-2">Emails automatiques</h3>
+        <p className="text-gray-300 text-sm leading-relaxed mb-3">
+          Ton adresse email est utilisée pour l'envoi des confirmations et de l'attestation finale via Brevo, notre prestataire d'emailing transactionnel.
+        </p>
         <p className="text-gray-300 text-sm leading-relaxed">
-          Ton adresse email est utilisée pour l'envoi des confirmations et de l'attestation finale via Resend.
+          Dans le cadre de ces envois, Brevo comptabilise les ouvertures et les clics sur les emails que nous t'adressons, afin de nous permettre de vérifier la bonne délivrabilité de nos communications (par exemple, confirmer qu'un email de bienvenue ou d'accès a bien été reçu et ouvert). Ces statistiques sont associées à ton adresse email.
         </p>
       </section>
 
@@ -55,7 +58,8 @@
               {[
                 ["Email + prénom", "Création du compte — envoi des accès — emails de suivi"],
                 ["Données de connexion", "Suivi de progression — génération du certificat"],
-                ["Données de paiement", "Traitement de la transaction (via Stripe uniquement)"],
+                ["Données de paiement", "Traitement de la transaction (via Stripe, carte ou Klarna)"],
+                ["Ouvertures / clics email", "Mesure de la délivrabilité des emails transactionnels (via Brevo)"],
               ].map(([donnee, finalite], i) => (
                 <tr key={donnee} className={`border-t border-white/10 ${i % 2 === 1 ? "bg-white/5" : ""}`}>
                   <td className="px-4 py-3 text-white">{donnee}</td>
@@ -94,8 +98,9 @@
               {[
                 ["Supabase", "Hébergement de la base de données et authentification"],
                 ["Vercel", "Hébergement du site web"],
-                ["Stripe", "Traitement sécurisé des paiements"],
-                ["Resend", "Envoi des emails transactionnels (bienvenue, accusé de rétractation)"],
+                ["Stripe", "Traitement sécurisé des paiements (carte bancaire et Klarna)"],
+                ["Klarna", "Solution de paiement fractionné tierce, indépendante de N.F."],
+                ["Brevo", "Envoi des emails transactionnels (bienvenue, accusé de rétractation, attestation) et suivi des ouvertures/clics associés"],
               ].map(([name, role], i) => (
                 <tr key={name} className={`border-t border-white/10 ${i % 2 === 1 ? "bg-white/5" : ""}`}>
                   <td className="px-4 py-3 font-medium text-white">{name}</td>
@@ -136,7 +141,7 @@
                 ["Droit de rectification", "Corriger des données inexactes"],
                 ["Droit à l'effacement", "Supprimer ton compte et tes données"],
                 ["Droit à la portabilité", "Recevoir tes données dans un format lisible"],
-                ["Droit d'opposition", "T'opposer à certains traitements"],
+                ["Droit d'opposition", "T'opposer à certains traitements, y compris au suivi des ouvertures/clics de nos emails"],
               ].map(([droit, desc], i) => (
                 <tr key={droit} className={`border-t border-white/10 ${i % 2 === 1 ? "bg-white/5" : ""}`}>
                   <td className="px-4 py-3 font-medium text-white w-1/3">{droit}</td>
